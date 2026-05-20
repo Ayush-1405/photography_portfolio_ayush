@@ -1,0 +1,12 @@
+{
+  "admins": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password_hash": "$2a$10$QMkPOm8aRlyUQ.dsp55CKuMEcDo793MW2n9ptoyhz8EVCV5iAC64S",
+      "created_at": "2026-05-20T03:23:48.192Z"
+    }
+  ],
+  "projects": [],
+  "gallery": []
+}
