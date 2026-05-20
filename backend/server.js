@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 4000;
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173"],
+  origin: ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "https://photography-portfolio-ayush-admin.onrender.com", "https://photography-portfolio-ayush.onrender.com"],
   credentials: true,
 }));
 app.use(express.json());

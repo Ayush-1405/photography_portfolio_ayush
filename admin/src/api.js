@@ -1,4 +1,4 @@
-const BASE = "/api";
+const BASE = "https://photography-portfolio-ayush-backend.onrender.com";
 
 function getToken() {
   return localStorage.getItem("admin_token");
