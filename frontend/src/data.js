@@ -62,13 +62,13 @@ export const projects = [
 ];
 
 export const stripImages = [
-  "/gallery/1430576.jpg.jpeg",
-  "/gallery/1330678.jpg.jpeg",
+  "/image-1.jpg",
+  "/image-2.jpg",
   
-  "/gallery/1430562.jpg.jpeg",
-  "/gallery/1430567.jpg.jpeg",
-  "/gallery/1430539.jpg.jpeg",
-  "/gallery/1430587.jpg.jpeg",
+  "/image-3.jpg",
+  "/image-4.jpg",
+  "/image-5.jpg",
+  "/image-6.jpg",
 ];
 
 export const services = [
