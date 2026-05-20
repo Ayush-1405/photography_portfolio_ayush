@@ -7,8 +7,8 @@ const MONGO_URI =
   "mongodb+srv://career_advisor:CareerAdvisorDB1405@cluster0.94w7mbi.mongodb.net/photography?appName=Cluster0&retryWrites=true&w=majority";
 
 async function connectDb() {
-  await mongoose.connect(MONGO_URI);
-  console.log("MongoDB connected");
+  await mongoose.connect(MONGO_URI, { dbName: "photography" });
+  console.log("MongoDB connected → photography");
   await seedAdmin();
 }
 
@@ -26,9 +26,11 @@ const projectSchema = new mongoose.Schema(
     category: { type: String, required: true },
     year: { type: String, required: true },
     description: { type: String, default: "" },
-    src: { type: String, required: true },
+    src: { type: String, required: true },         // Cloudinary secure_url
+    public_id: { type: String, default: null },    // Cloudinary public_id for deletion
     type: { type: String, enum: ["image", "video"], required: true },
-    poster: { type: String, default: null },
+    poster: { type: String, default: null },        // Cloudinary URL for poster
+    poster_public_id: { type: String, default: null },
     sort_order: { type: Number, default: 0 },
   },
   { timestamps: true, collection: "projects" }
@@ -37,7 +39,8 @@ const projectSchema = new mongoose.Schema(
 const gallerySchema = new mongoose.Schema(
   {
     type: { type: String, enum: ["image", "video"], required: true },
-    src: { type: String, required: true },
+    src: { type: String, required: true },         // Cloudinary secure_url
+    public_id: { type: String, default: null },    // Cloudinary public_id for deletion
     span: {
       type: String,
       enum: ["normal", "tall", "wide", "large"],
@@ -45,6 +48,7 @@ const gallerySchema = new mongoose.Schema(
     },
     caption: { type: String, default: "" },
     poster: { type: String, default: null },
+    poster_public_id: { type: String, default: null },
     sort_order: { type: Number, default: 0 },
   },
   { timestamps: true, collection: "gallery" }

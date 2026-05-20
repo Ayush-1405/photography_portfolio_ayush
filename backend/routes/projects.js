@@ -1,13 +1,33 @@
 const express = require("express");
-const path = require("path");
-const fs = require("fs");
 const { Project } = require("../db");
 const { requireAuth } = require("../middleware/auth");
 const { projectUpload } = require("../middleware/upload");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../services/cloudinary");
 
 const router = express.Router();
 
-// GET /api/projects — public
+function getResourceType(file) {
+  const videoMime = ["video/mp4", "video/quicktime", "video/webm"];
+  const videoExt = /\.(mp4|mov|webm)$/i;
+  if (videoMime.includes(file.mimetype) || videoExt.test(file.originalname)) {
+    return "video";
+  }
+  return "image";
+}
+
+async function uploadFile(file, subfolder) {
+  if (!file || !file.buffer) {
+    throw new Error(`uploadFile: no buffer for field "${file?.fieldname}"`);
+  }
+  const resource_type = getResourceType(file);
+  const result = await uploadToCloudinary(file.buffer, {
+    folder: `gallery/${subfolder}`,
+    resource_type,
+  });
+  return { ...result, resource_type };
+}
+
+// GET /api/projects
 router.get("/", async (req, res) => {
   try {
     const rows = await Project.find().sort({ sort_order: 1, createdAt: -1 }).lean();
@@ -17,7 +37,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/projects/:id — public
+// GET /api/projects/:id
 router.get("/:id", async (req, res) => {
   try {
     const row = await Project.findById(req.params.id).lean();
@@ -28,7 +48,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST /api/projects — protected
+// POST /api/projects
 router.post(
   "/",
   requireAuth,
@@ -38,24 +58,38 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      const { title, category, year, description, src, type, sort_order } = req.body;
+      const { title, category, year, description, src, sort_order } = req.body;
+      let calculatedType = req.body.type;
 
-      if (!title || !category || !year || !type) {
-        return res.status(400).json({ error: "title, category, year, type are required" });
+      if (!title || !category || !year) {
+        return res.status(400).json({ error: "title, category, and year are required" });
       }
 
       let mediaSrc = src || null;
-      let posterSrc = null;
+      let mediaPublicId = null;
 
       if (req.files?.media?.[0]) {
-        mediaSrc = `/uploads/project/${req.files.media[0].filename}`;
-      }
-      if (req.files?.poster?.[0]) {
-        posterSrc = `/uploads/project/${req.files.poster[0].filename}`;
+        const result = await uploadFile(req.files.media[0], "project");
+        mediaSrc = result.secure_url;
+        mediaPublicId = result.public_id;
+        calculatedType = result.resource_type; // Strict override from file detection
       }
 
       if (!mediaSrc) {
         return res.status(400).json({ error: "Media file or src URL is required" });
+      }
+
+      // Safeguard validation against enum mismatch
+      if (calculatedType !== "image" && calculatedType !== "video") {
+        calculatedType = "image";
+      }
+
+      let posterSrc = null;
+      let posterPublicId = null;
+      if (req.files?.poster?.[0]) {
+        const result = await uploadFile(req.files.poster[0], "project");
+        posterSrc = result.secure_url;
+        posterPublicId = result.public_id;
       }
 
       const project = await Project.create({
@@ -63,9 +97,11 @@ router.post(
         category,
         year,
         description: description || "",
+        type: calculatedType,
         src: mediaSrc,
-        type,
-        poster: posterSrc || null,
+        public_id: mediaPublicId,
+        poster: posterSrc,
+        poster_public_id: posterPublicId,
         sort_order: parseInt(sort_order) || 0,
       });
 
@@ -76,7 +112,7 @@ router.post(
   }
 );
 
-// PUT /api/projects/:id — protected
+// PUT /api/projects/:id
 router.put(
   "/:id",
   requireAuth,
@@ -92,22 +128,32 @@ router.put(
       const { title, category, year, description, src, type, sort_order } = req.body;
 
       if (req.files?.media?.[0]) {
-        deleteUpload(existing.src);
-        existing.src = `/uploads/project/${req.files.media[0].filename}`;
-      } else if (src) {
+        if (existing.public_id) {
+          await deleteFromCloudinary(existing.public_id, existing.type === "video" ? "video" : "image");
+        }
+        const result = await uploadFile(req.files.media[0], "project");
+        existing.src = result.secure_url;
+        existing.public_id = result.public_id;
+        existing.type = result.resource_type;
+      } else if (src && src !== existing.src) {
         existing.src = src;
+        existing.public_id = null;
       }
 
       if (req.files?.poster?.[0]) {
-        deleteUpload(existing.poster);
-        existing.poster = `/uploads/project/${req.files.poster[0].filename}`;
+        if (existing.poster_public_id) {
+          await deleteFromCloudinary(existing.poster_public_id, "image");
+        }
+        const result = await uploadFile(req.files.poster[0], "project");
+        existing.poster = result.secure_url;
+        existing.poster_public_id = result.public_id;
       }
 
-      if (title) existing.title = title;
-      if (category) existing.category = category;
-      if (year) existing.year = year;
+      if (title !== undefined) existing.title = title;
+      if (category !== undefined) existing.category = category;
+      if (year !== undefined) existing.year = year;
       if (description !== undefined) existing.description = description;
-      if (type) existing.type = type;
+      if (type !== undefined && (type === "image" || type === "video")) existing.type = type;
       if (sort_order !== undefined) existing.sort_order = parseInt(sort_order);
 
       await existing.save();
@@ -118,14 +164,18 @@ router.put(
   }
 );
 
-// DELETE /api/projects/:id — protected
+// DELETE /api/projects/:id
 router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const existing = await Project.findById(req.params.id);
     if (!existing) return res.status(404).json({ error: "Not found" });
 
-    deleteUpload(existing.src);
-    deleteUpload(existing.poster);
+    if (existing.public_id) {
+      await deleteFromCloudinary(existing.public_id, existing.type === "video" ? "video" : "image");
+    }
+    if (existing.poster_public_id) {
+      await deleteFromCloudinary(existing.poster_public_id, "image");
+    }
 
     await existing.deleteOne();
     res.json({ ok: true });
@@ -133,12 +183,5 @@ router.delete("/:id", requireAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-function deleteUpload(src) {
-  if (src && src.startsWith("/uploads/")) {
-    const p = path.join(__dirname, "../..", src);
-    if (fs.existsSync(p)) fs.unlinkSync(p);
-  }
-}
 
 module.exports = router;

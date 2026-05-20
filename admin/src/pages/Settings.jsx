@@ -32,75 +32,93 @@ export default function Settings() {
   }
 
   return (
-    <div className="p-8 max-w-lg">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-bone">Settings</h1>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-semibold text-bone">Settings</h1>
         <p className="text-sm text-mist mt-1">Manage your admin account</p>
       </div>
 
-      <div className="bg-graphite border border-white/5 rounded-lg p-6">
-        <h2 className="text-sm font-semibold text-bone mb-4 uppercase tracking-wider">Change Password</h2>
+      <div className="max-w-md space-y-4">
+        {/* Change password */}
+        <div className="bg-graphite border border-white/5 rounded-lg p-4 sm:p-6">
+          <h2 className="text-xs sm:text-sm font-semibold text-bone mb-4 uppercase tracking-wider">
+            Change Password
+          </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-3 py-2 rounded">
-              {error}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-3 py-2 rounded">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="bg-green-500/10 border border-green-500/20 text-green-400 text-sm px-3 py-2 rounded">
+                {success}
+              </div>
+            )}
+
+            <div>
+              <label className="field-label">Current Password</label>
+              <input
+                type="password"
+                className="field-input"
+                value={form.currentPassword}
+                onChange={(e) => setForm({ ...form, currentPassword: e.target.value })}
+                required
+                autoComplete="current-password"
+              />
             </div>
-          )}
-          {success && (
-            <div className="bg-green-500/10 border border-green-500/20 text-green-400 text-sm px-3 py-2 rounded">
-              {success}
+            <div>
+              <label className="field-label">New Password</label>
+              <input
+                type="password"
+                className="field-input"
+                value={form.newPassword}
+                onChange={(e) => setForm({ ...form, newPassword: e.target.value })}
+                required
+                minLength={6}
+                autoComplete="new-password"
+              />
             </div>
-          )}
+            <div>
+              <label className="field-label">Confirm New Password</label>
+              <input
+                type="password"
+                className="field-input"
+                value={form.confirmPassword}
+                onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                required
+                autoComplete="new-password"
+              />
+            </div>
 
-          <div>
-            <label className="field-label">Current Password</label>
-            <input
-              type="password"
-              className="field-input"
-              value={form.currentPassword}
-              onChange={(e) => setForm({ ...form, currentPassword: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label className="field-label">New Password</label>
-            <input
-              type="password"
-              className="field-input"
-              value={form.newPassword}
-              onChange={(e) => setForm({ ...form, newPassword: e.target.value })}
-              required
-              minLength={6}
-            />
-          </div>
-          <div>
-            <label className="field-label">Confirm New Password</label>
-            <input
-              type="password"
-              className="field-input"
-              value={form.confirmPassword}
-              onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-              required
-            />
-          </div>
+            <button
+              type="submit"
+              disabled={saving}
+              className="w-full bg-accent text-ink font-semibold text-sm py-2.5 rounded hover:bg-accent/90 transition-colors disabled:opacity-50"
+            >
+              {saving ? "Saving…" : "Update Password"}
+            </button>
+          </form>
+        </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full bg-accent text-ink font-semibold text-sm py-2.5 rounded hover:bg-accent/90 transition-colors disabled:opacity-50 mt-2"
-          >
-            {saving ? "Saving…" : "Update Password"}
-          </button>
-        </form>
-      </div>
-
-      <div className="bg-graphite border border-white/5 rounded-lg p-6 mt-4">
-        <h2 className="text-sm font-semibold text-bone mb-2 uppercase tracking-wider">API Info</h2>
-        <div className="space-y-2 text-xs text-mist font-mono">
-          <p>Backend: <span className="text-bone">http://localhost:4000</span></p>
-          <p>Projects API: <span className="text-bone">GET /api/projects</span></p>
-          <p>Gallery API: <span className="text-bone">GET /api/gallery</span></p>
+        {/* API info */}
+        <div className="bg-graphite border border-white/5 rounded-lg p-4 sm:p-6">
+          <h2 className="text-xs sm:text-sm font-semibold text-bone mb-3 uppercase tracking-wider">
+            API Endpoints
+          </h2>
+          <div className="space-y-2 text-xs text-mist font-mono">
+            {[
+              ["Projects", "GET /api/projects"],
+              ["Gallery",  "GET /api/gallery"],
+              ["Login",    "POST /api/auth/login"],
+            ].map(([label, endpoint]) => (
+              <div key={label} className="flex items-center justify-between gap-4 py-1.5 border-b border-white/5 last:border-0">
+                <span className="text-mist/60">{label}</span>
+                <span className="text-bone">{endpoint}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

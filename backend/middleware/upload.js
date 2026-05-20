@@ -1,41 +1,41 @@
 const multer = require("multer");
-const path = require("path");
-const { v4: uuidv4 } = require("uuid");
 
-function makeStorage(folder) {
-  return multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, "../uploads", folder));
-    },
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname).toLowerCase();
-      cb(null, `${uuidv4()}${ext}`);
-    },
-  });
-}
+/**
+ * Memory storage — files land in req.files[fieldName][0].buffer
+ * We stream them to Cloudinary manually in each route handler.
+ */
+const memoryStorage = multer.memoryStorage();
 
-const imageFilter = (req, file, cb) => {
-  const allowed = /jpeg|jpg|png|webp|gif|heic|heif/i;
-  if (allowed.test(path.extname(file.originalname))) cb(null, true);
-  else cb(new Error("Only image files are allowed"));
-};
-
+/**
+ * Accept by MIME type (most reliable) with filename extension as fallback.
+ * Browsers set mimetype correctly; some tools only set the filename.
+ */
 const mediaFilter = (req, file, cb) => {
-  const allowed = /jpeg|jpg|png|webp|gif|heic|heif|mp4|mov|webm/i;
-  if (allowed.test(path.extname(file.originalname))) cb(null, true);
-  else cb(new Error("Only image or video files are allowed"));
+  const allowedMime = [
+    "image/jpeg", "image/jpg", "image/png", "image/webp",
+    "image/gif",  "image/heic", "image/heif",
+    "video/mp4",  "video/quicktime", "video/webm",
+    "application/octet-stream", // some browsers send this for heic/heif
+  ];
+  const allowedExt = /\.(jpe?g|png|webp|gif|heic|heif|mp4|mov|webm)$/i;
+
+  const mimeOk = allowedMime.includes(file.mimetype);
+  const extOk  = allowedExt.test(file.originalname);
+
+  if (mimeOk || extOk) {
+    cb(null, true);
+  } else {
+    cb(new Error(`Unsupported file: ${file.originalname} (${file.mimetype})`));
+  }
 };
 
-const galleryUpload = multer({
-  storage: makeStorage("gallery"),
+const uploadMiddleware = multer({
+  storage: memoryStorage,
   fileFilter: mediaFilter,
   limits: { fileSize: 500 * 1024 * 1024 }, // 500 MB
 });
 
-const projectUpload = multer({
-  storage: makeStorage("project"),
-  fileFilter: mediaFilter,
-  limits: { fileSize: 500 * 1024 * 1024 },
-});
-
-module.exports = { galleryUpload, projectUpload };
+module.exports = {
+  galleryUpload: uploadMiddleware,
+  projectUpload: uploadMiddleware,
+};

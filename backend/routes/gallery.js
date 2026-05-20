@@ -1,13 +1,33 @@
 const express = require("express");
-const path = require("path");
-const fs = require("fs");
 const { Gallery } = require("../db");
 const { requireAuth } = require("../middleware/auth");
 const { galleryUpload } = require("../middleware/upload");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../services/cloudinary");
 
 const router = express.Router();
 
-// GET /api/gallery — public
+function getResourceType(file) {
+  const videoMime = ["video/mp4", "video/quicktime", "video/webm"];
+  const videoExt = /\.(mp4|mov|webm)$/i;
+  if (videoMime.includes(file.mimetype) || videoExt.test(file.originalname)) {
+    return "video";
+  }
+  return "image";
+}
+
+async function uploadFile(file, subfolder) {
+  if (!file || !file.buffer) {
+    throw new Error(`uploadFile: no buffer for field "${file?.fieldname}"`);
+  }
+  const resource_type = getResourceType(file);
+  const result = await uploadToCloudinary(file.buffer, {
+    folder: `gallery/${subfolder}`,
+    resource_type,
+  });
+  return { ...result, resource_type };
+}
+
+// GET /api/gallery
 router.get("/", async (req, res) => {
   try {
     const rows = await Gallery.find().sort({ sort_order: 1, createdAt: -1 }).lean();
@@ -17,7 +37,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST /api/gallery — protected
+// POST /api/gallery
 router.post(
   "/",
   requireAuth,
@@ -27,30 +47,44 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      const { type, span, caption, src, sort_order } = req.body;
-
-      if (!type) return res.status(400).json({ error: "type is required" });
+      const { span, caption, src, sort_order } = req.body;
+      let calculatedType = req.body.type;
 
       let mediaSrc = src || null;
-      let posterSrc = null;
+      let mediaPublicId = null;
 
       if (req.files?.media?.[0]) {
-        mediaSrc = `/uploads/gallery/${req.files.media[0].filename}`;
-      }
-      if (req.files?.poster?.[0]) {
-        posterSrc = `/uploads/gallery/${req.files.poster[0].filename}`;
+        const result = await uploadFile(req.files.media[0], "gallery");
+        mediaSrc = result.secure_url;
+        mediaPublicId = result.public_id;
+        calculatedType = result.resource_type; // Strict override from file detection
       }
 
       if (!mediaSrc) {
         return res.status(400).json({ error: "Media file or src URL is required" });
       }
 
+      // Safeguard validation against enum mismatch
+      if (calculatedType !== "image" && calculatedType !== "video") {
+        calculatedType = "image";
+      }
+
+      let posterSrc = null;
+      let posterPublicId = null;
+      if (req.files?.poster?.[0]) {
+        const result = await uploadFile(req.files.poster[0], "gallery");
+        posterSrc = result.secure_url;
+        posterPublicId = result.public_id;
+      }
+
       const item = await Gallery.create({
-        type,
+        type: calculatedType,
         src: mediaSrc,
+        public_id: mediaPublicId,
         span: span || "tall",
         caption: caption || "",
-        poster: posterSrc || null,
+        poster: posterSrc,
+        poster_public_id: posterPublicId,
         sort_order: parseInt(sort_order) || 0,
       });
 
@@ -61,7 +95,7 @@ router.post(
   }
 );
 
-// PUT /api/gallery/:id — protected
+// PUT /api/gallery/:id
 router.put(
   "/:id",
   requireAuth,
@@ -77,19 +111,29 @@ router.put(
       const { type, span, caption, src, sort_order } = req.body;
 
       if (req.files?.media?.[0]) {
-        deleteUpload(existing.src);
-        existing.src = `/uploads/gallery/${req.files.media[0].filename}`;
-      } else if (src) {
+        if (existing.public_id) {
+          await deleteFromCloudinary(existing.public_id, existing.type === "video" ? "video" : "image");
+        }
+        const result = await uploadFile(req.files.media[0], "gallery");
+        existing.src = result.secure_url;
+        existing.public_id = result.public_id;
+        existing.type = result.resource_type;
+      } else if (src && src !== existing.src) {
         existing.src = src;
+        existing.public_id = null;
       }
 
       if (req.files?.poster?.[0]) {
-        deleteUpload(existing.poster);
-        existing.poster = `/uploads/gallery/${req.files.poster[0].filename}`;
+        if (existing.poster_public_id) {
+          await deleteFromCloudinary(existing.poster_public_id, "image");
+        }
+        const result = await uploadFile(req.files.poster[0], "gallery");
+        existing.poster = result.secure_url;
+        existing.poster_public_id = result.public_id;
       }
 
-      if (type) existing.type = type;
-      if (span) existing.span = span;
+      if (type !== undefined && (type === "image" || type === "video")) existing.type = type;
+      if (span !== undefined) existing.span = span;
       if (caption !== undefined) existing.caption = caption;
       if (sort_order !== undefined) existing.sort_order = parseInt(sort_order);
 
@@ -101,14 +145,18 @@ router.put(
   }
 );
 
-// DELETE /api/gallery/:id — protected
+// DELETE /api/gallery/:id
 router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const existing = await Gallery.findById(req.params.id);
     if (!existing) return res.status(404).json({ error: "Not found" });
 
-    deleteUpload(existing.src);
-    deleteUpload(existing.poster);
+    if (existing.public_id) {
+      await deleteFromCloudinary(existing.public_id, existing.type === "video" ? "video" : "image");
+    }
+    if (existing.poster_public_id) {
+      await deleteFromCloudinary(existing.poster_public_id, "image");
+    }
 
     await existing.deleteOne();
     res.json({ ok: true });
@@ -116,12 +164,5 @@ router.delete("/:id", requireAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-function deleteUpload(src) {
-  if (src && src.startsWith("/uploads/")) {
-    const p = path.join(__dirname, "../..", src);
-    if (fs.existsSync(p)) fs.unlinkSync(p);
-  }
-}
 
 module.exports = router;

@@ -1,4 +1,5 @@
-const BASE = "https://photography-portfolio-ayush-backend.onrender.com/api";
+// Use VITE_API_URL env var if set, otherwise fall back to local backend
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
 function getToken() {
   return localStorage.getItem("admin_token");
@@ -8,7 +9,8 @@ function authHeaders() {
   return { Authorization: `Bearer ${getToken()}` };
 }
 
-// Auth
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
 export async function login(username, password) {
   const res = await fetch(`${BASE}/auth/login`, {
     method: "POST",
@@ -31,16 +33,18 @@ export async function changePassword(currentPassword, newPassword) {
   return data;
 }
 
-// Projects
+// ── Projects ──────────────────────────────────────────────────────────────────
+
 export async function getProjects() {
   const res = await fetch(`${BASE}/projects`);
+  if (!res.ok) throw new Error("Failed to fetch projects");
   return res.json();
 }
 
 export async function createProject(formData) {
   const res = await fetch(`${BASE}/projects`, {
     method: "POST",
-    headers: authHeaders(),
+    headers: authHeaders(),   // NO Content-Type — browser sets it with boundary for FormData
     body: formData,
   });
   const data = await res.json();
@@ -69,16 +73,18 @@ export async function deleteProject(id) {
   return data;
 }
 
-// Gallery
+// ── Gallery ───────────────────────────────────────────────────────────────────
+
 export async function getGallery() {
   const res = await fetch(`${BASE}/gallery`);
+  if (!res.ok) throw new Error("Failed to fetch gallery");
   return res.json();
 }
 
 export async function createGalleryItem(formData) {
   const res = await fetch(`${BASE}/gallery`, {
     method: "POST",
-    headers: authHeaders(),
+    headers: authHeaders(),   // NO Content-Type — browser sets it with boundary for FormData
     body: formData,
   });
   const data = await res.json();
