@@ -29,6 +29,28 @@ export function ProjectGrid() {
   }, []);
 
   const projectKey = (p) => p._id || p.id;
+  const driveLink = "https://drive.google.com/drive/folders/19LcsP9ay1-SMdxQ4jfXTnaMJpuBjgJwj";
+
+  const DriveButton = ({ large = false }) => (
+    <motion.a
+      href={driveLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`flex w-full items-center justify-center gap-3 ${
+        large ? "py-6 text-sm" : "py-5 text-[10px]"
+      } bg-accent text-void font-sans uppercase tracking-[0.3em] hover:bg-white transition-colors duration-300 rounded-sm sm:w-auto sm:px-12`}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+    >
+      View All Projects
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+    </motion.a>
+  );
 
   return (
     <section id="work" className="px-6 py-24 sm:px-10 lg:px-16 lg:py-32">
@@ -54,77 +76,81 @@ export function ProjectGrid() {
           ))}
         </div>
       ) : projects.length === 0 ? (
-        <div className="mt-16 text-center py-20 text-mist">
-          <p className="text-4xl mb-3 opacity-30">◈</p>
-          <p className="text-sm">No projects yet.</p>
+        <div className="mx-auto mt-16 flex max-w-6xl justify-center py-20">
+          <DriveButton large />
         </div>
       ) : (
-        <motion.ul
-          className="mx-auto mt-16 grid max-w-6xl gap-6 sm:grid-cols-2 lg:gap-8"
-          variants={reduce ? undefined : container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-        >
-          {projects.map((p) => (
-            <motion.li
-              key={projectKey(p)}
-              variants={reduce ? undefined : itemVariant}
-              className="group relative overflow-hidden rounded-sm bg-graphite cursor-pointer"
-              onClick={() => setActiveProject({ src: p.src, type: p.type, poster: p.poster })}
-            >
-              <div className="aspect-[4/3] sm:aspect-[16/11] relative">
-                {p.type === "video" ? (
-                  <video
-                    src={p.src}
-                    poster={p.poster || undefined}
-                    className="h-full w-full object-cover transition-[filter] duration-700 group-hover:brightness-110"
-                    muted
-                    playsInline
-                    preload="metadata"
-                  />
-                ) : (
-                  <motion.img
-                    src={p.src}
-                    alt={p.title || ""}
-                    className="h-full w-full object-cover transition-[filter] duration-700 group-hover:brightness-110"
-                    loading="lazy"
-                    whileHover={reduce ? undefined : { scale: 1.04 }}
-                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                )}
+        <>
+          <motion.ul
+            className="mx-auto mt-16 grid max-w-6xl gap-6 sm:grid-cols-2 lg:gap-8"
+            variants={reduce ? undefined : container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-60px" }}
+          >
+            {projects.map((p) => (
+              <motion.li
+                key={projectKey(p)}
+                variants={reduce ? undefined : itemVariant}
+                className="group relative overflow-hidden rounded-sm bg-graphite cursor-pointer"
+                onClick={() => setActiveProject({ src: p.src, type: p.type, poster: p.poster })}
+              >
+                <div className="aspect-[4/3] sm:aspect-[16/11] relative">
+                  {p.type === "video" ? (
+                    <video
+                      src={p.src}
+                      poster={p.poster || undefined}
+                      className="h-full w-full object-cover transition-[filter] duration-700 group-hover:brightness-110"
+                      muted
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : (
+                    <motion.img
+                      src={p.src}
+                      alt={p.title || ""}
+                      className="h-full w-full object-cover transition-[filter] duration-700 group-hover:brightness-110"
+                      loading="lazy"
+                      whileHover={reduce ? undefined : { scale: 1.04 }}
+                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  )}
 
-                {p.type === "video" && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border border-white/50 bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover:border-accent/80 group-hover:bg-black/60 transition-all duration-300">
-                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                  {p.type === "video" && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border border-white/50 bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover:border-accent/80 group-hover:bg-black/60 transition-all duration-300">
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void via-void/20 to-transparent opacity-90" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void via-void/20 to-transparent opacity-90" />
 
-              <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-accent/90">
-                  {p.category} · {p.year}
-                </p>
-                <h3 className="mt-2 font-display text-2xl text-bone sm:text-3xl">{p.title}</h3>
-                <p className="mt-2 max-w-md font-sans text-sm text-mist opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                  {p.description}
-                </p>
-              </div>
+                <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                  <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-accent/90">
+                    {p.category} · {p.year}
+                  </p>
+                  <h3 className="mt-2 font-display text-2xl text-bone sm:text-3xl">{p.title}</h3>
+                  <p className="mt-2 max-w-md font-sans text-sm text-mist opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                    {p.description}
+                  </p>
+                </div>
 
-              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="font-sans text-[9px] uppercase tracking-widest text-bone bg-black/50 backdrop-blur-sm px-2.5 py-1 border border-white/10">
-                  {p.type === "video" ? "Play" : "View"}
-                </span>
-              </div>
-            </motion.li>
-          ))}
-        </motion.ul>
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="font-sans text-[9px] uppercase tracking-widest text-bone bg-black/50 backdrop-blur-sm px-2.5 py-1 border border-white/10">
+                    {p.type === "video" ? "Play" : "View"}
+                  </span>
+                </div>
+              </motion.li>
+            ))}
+          </motion.ul>
+          <div className="mx-auto mt-20 flex max-w-6xl justify-center">
+            <DriveButton />
+          </div>
+        </>
       )}
 
       {/* Wrapping the Lightbox properly so unmounting animations execute */}
