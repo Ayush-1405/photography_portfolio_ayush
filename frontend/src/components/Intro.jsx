@@ -116,7 +116,7 @@ export function Intro() {
                 />
               </motion.div>
               <div className="absolute top-8 right-[-5%] sm:right-[-10%] lg:right-[-20%]">
-                <p className="font-mono text-[8px] sm:text-[10px] lg:text-xs-mono uppercase tracking-[0.8em] text-bone/20 rotate-90 origin-left whitespace-nowrap">
+                <p className="font-mono text-[8px] sm:text-[10px] lg:text-xs-mono uppercase tracking-[0.8em] text-bone/20 rotate-90 origin-right whitespace-nowrap">
                   Visual Artist
                 </p>
               </div>
