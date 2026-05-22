@@ -30,9 +30,13 @@ export default function Projects() {
   /* ── data ── */
   async function load() {
     setLoading(true);
+    setError("");
     try {
       const data = await getProjects();
       setItems(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load projects:", err);
+      setError("Failed to synchronize with database. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -88,6 +92,7 @@ export default function Projects() {
     });
     setMediaFile(null);
     setPosterFile(null);
+    setPosterPreview(item.poster || null);
     setError("");
     setShowModal(true);
   }
@@ -134,84 +139,93 @@ export default function Projects() {
 
   /* ════════════════════════════════════════════════════════════ */
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="max-w-7xl animate-in fade-in duration-700">
 
       {/* ── Page header ── */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-bone">Projects</h1>
-          <p className="text-xs sm:text-sm text-mist mt-0.5">
-            {items.length} project{items.length !== 1 ? "s" : ""}
+          <p className="font-mono text-xs-mono uppercase text-accent mb-2 tracking-[0.3em]">Content Management</p>
+          <h1 className="font-display text-4xl lg:text-5xl text-bone">Featured Projects</h1>
+          <p className="font-sans text-sm text-mist/60 mt-2">
+            You have {items.length} active project{items.length !== 1 ? "s" : ""} in your featured portfolio.
           </p>
         </div>
         <button
           onClick={openCreate}
-          className="bg-accent text-ink text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-lg hover:bg-accent/90 active:scale-95 transition-all flex items-center gap-1.5"
+          className="group relative inline-flex items-center gap-4 font-mono text-xs-mono uppercase text-bone px-8 py-4 border border-accent/30 hover:border-accent transition-all duration-500 overflow-hidden"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          <span className="hidden sm:inline">Add Project</span>
-          <span className="sm:hidden">Add</span>
+          <span className="relative z-10 flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Add New Project
+          </span>
+          <div className="absolute inset-0 bg-accent/5 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
         </button>
       </div>
 
       {/* ── Grid ── */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="bg-graphite border border-white/5 rounded-lg overflow-hidden animate-pulse">
+            <div key={i} className="bg-ink border border-white/5 rounded-sm overflow-hidden animate-pulse">
               <div className="aspect-[16/10] bg-white/5" />
-              <div className="p-4 space-y-2">
-                <div className="h-3 bg-white/5 rounded w-3/4" />
-                <div className="h-2 bg-white/5 rounded w-1/2" />
+              <div className="p-8 space-y-4">
+                <div className="h-4 bg-white/5 rounded w-3/4" />
+                <div className="h-3 bg-white/5 rounded w-1/2" />
               </div>
             </div>
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-16 sm:py-24 text-mist">
-          <svg className="w-10 h-10 mx-auto mb-3 opacity-20" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
+        <div className="text-center py-32 bg-ink border border-dashed border-white/10 rounded-sm">
+          <svg className="w-12 h-12 mx-auto mb-6 text-accent/20" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
             <rect x="3" y="3" width="18" height="13" rx="1" /><path d="M8 21h8M12 17v4" />
           </svg>
-          <p className="text-sm">No projects yet.</p>
-          <button onClick={openCreate} className="mt-3 text-accent text-sm hover:underline">
-            Add your first project →
+          <p className="font-display text-2xl text-bone mb-2">No projects found.</p>
+          <p className="font-mono text-xs-mono uppercase text-mist mb-8">Start by adding your first featured work</p>
+          <button onClick={openCreate} className="text-accent font-mono text-xs uppercase tracking-widest hover:underline underline-offset-8">
+            Create Project →
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {items.map((item) => (
-            <div key={item._id} className="bg-graphite border border-white/5 rounded-lg overflow-hidden">
-              {/* thumbnail — relative so MediaPreview's absolute works */}
-              <div className="aspect-[16/10] relative bg-black">
-                <MediaPreview
-                  src={previewSrc}
-                  type={form.type}
-                  poster={posterPreview || undefined}
+            <div key={item._id} className="group bg-ink border border-white/5 rounded-sm overflow-hidden hover:border-accent/30 transition-all duration-700">
+              {/* thumbnail */}
+              <div className="aspect-[16/10] relative bg-void overflow-hidden">
+                <img 
+                  src={item.src} 
+                  alt={item.title}
+                  className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
                 />
-                <div className="absolute top-2 right-2">
-                  <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border backdrop-blur-sm ${item.type === "video"
-                    ? "text-blue-400 border-blue-400/30 bg-black/60"
-                    : "text-accent border-accent/30 bg-black/60"
+                <div className="absolute top-4 right-4">
+                  <span className={`text-[9px] font-mono uppercase tracking-[0.2em] px-3 py-1.5 rounded-sm border backdrop-blur-md ${item.type === "video"
+                    ? "text-accent border-accent/30 bg-void/60"
+                    : "text-mist border-white/10 bg-void/60"
                     }`}>
                     {item.type}
                   </span>
                 </div>
               </div>
-              <div className="p-3 sm:p-4">
-                <p className="text-bone font-medium text-sm truncate">{item.title}</p>
-                <p className="text-xs text-mist mt-0.5">{item.category} · {item.year}</p>
+              <div className="p-8">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-bone font-display text-2xl mb-1">{item.title}</h3>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-accent/60">{item.category} // {item.year}</p>
+                  </div>
+                  <span className="font-mono text-[10px] text-mist/40">ORD.{item.sort_order || 0}</span>
+                </div>
+                
                 {item.description && (
-                  <p className="text-xs text-mist/70 mt-1.5 line-clamp-2">{item.description}</p>
+                  <p className="text-sm text-mist/60 mt-4 line-clamp-2 leading-relaxed font-sans">{item.description}</p>
                 )}
-                <div className="flex gap-2 mt-3">
+                
+                <div className="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-white/5">
                   <button onClick={() => openEdit(item)}
-                    className="flex-1 text-xs text-mist border border-white/10 rounded-md px-3 py-1.5 hover:text-bone hover:border-white/20 transition-colors">
+                    className="font-mono text-[10px] uppercase tracking-widest text-mist border border-white/10 rounded-sm py-3 hover:text-bone hover:border-accent/40 transition-all">
                     Edit
                   </button>
                   <button onClick={() => setDeleteConfirm(item)}
-                    className="flex-1 text-xs text-red-400 border border-red-400/20 rounded-md px-3 py-1.5 hover:bg-red-400/5 transition-colors">
+                    className="font-mono text-[10px] uppercase tracking-widest text-red-400/60 border border-red-400/10 rounded-sm py-3 hover:text-red-400 hover:bg-red-400/5 transition-all">
                     Delete
                   </button>
                 </div>
@@ -378,22 +392,14 @@ export default function Projects() {
           )}
 
           {/* ── Actions ── */}
-          <div className="flex gap-3 pt-2 border-t border-white/5">
-            <button type="button" onClick={() => setShowModal(false)}
-              className="flex-1 text-sm text-mist border border-white/10 rounded-lg px-4 py-2.5 hover:text-bone hover:border-white/20 transition-colors">
-              Cancel
-            </button>
+          <div className="flex gap-4 pt-10">
             <button type="submit" disabled={saving}
-              className="flex-1 text-sm bg-accent text-ink font-semibold rounded-lg px-4 py-2.5 hover:bg-accent/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {saving ? (
-                <>
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                  </svg>
-                  Uploading…
-                </>
-              ) : editing ? "Save Changes" : "Add Project"}
+              className="flex-1 bg-accent text-void font-mono text-xs uppercase tracking-[0.2em] font-bold py-5 rounded-sm hover:bg-white transition-all disabled:opacity-50">
+              {saving ? "Saving..." : "Commit Project"}
+            </button>
+            <button type="button" onClick={() => setShowModal(false)}
+              className="flex-1 border border-white/10 text-mist font-mono text-xs uppercase tracking-[0.2em] py-5 rounded-sm hover:text-bone hover:border-white/20 transition-all">
+              Cancel
             </button>
           </div>
 

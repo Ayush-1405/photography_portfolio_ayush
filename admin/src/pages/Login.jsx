@@ -24,43 +24,40 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-ink px-4 py-8">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center bg-void px-6 py-12">
+      <div className="w-full max-w-[440px]">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 mb-4">
-            <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
-            </svg>
+        <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent text-void font-display text-2xl font-bold mb-6">
+            A
           </div>
-          <h1 className="font-sans text-xl sm:text-2xl font-semibold text-bone">
-            Ayush<span className="text-accent">.</span>Admin
+          <h1 className="font-display text-3xl text-bone tracking-tight">
+            Ayush<span className="text-accent italic">.</span>Mistry
           </h1>
-          <p className="text-sm text-mist mt-1">Sign in to manage your portfolio</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-accent/60 mt-3">Portfolio Access</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-graphite rounded-xl p-5 sm:p-6 space-y-4 border border-white/5"
+          className="bg-ink border border-white/5 p-8 lg:p-10 space-y-8 rounded-sm animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200"
         >
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-3 py-2.5 rounded-lg flex items-center gap-2">
-              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+            <div className="bg-red-400/5 border border-red-400/10 text-red-400 text-xs font-mono uppercase tracking-widest px-5 py-4 rounded-sm flex items-center gap-3">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
               </svg>
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-xs text-mist mb-1.5 uppercase tracking-wider">Username</label>
+            <label className="field-label">Username</label>
             <input
               type="text"
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full bg-ink border border-white/10 rounded-lg px-3 py-2.5 text-sm text-bone placeholder-mist/40 focus:outline-none focus:border-accent/50 transition-colors"
-              placeholder="admin"
+              className="field-input"
+              placeholder="Identity"
               required
               autoFocus
               autoComplete="username"
@@ -68,12 +65,12 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-xs text-mist mb-1.5 uppercase tracking-wider">Password</label>
+            <label className="field-label">Passphrase</label>
             <input
               type="password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full bg-ink border border-white/10 rounded-lg px-3 py-2.5 text-sm text-bone placeholder-mist/40 focus:outline-none focus:border-accent/50 transition-colors"
+              className="field-input"
               placeholder="••••••••"
               required
               autoComplete="current-password"
@@ -83,22 +80,17 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-accent text-ink font-semibold text-sm py-2.5 rounded-lg hover:bg-accent/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+            className="group relative w-full bg-accent text-void font-mono text-xs uppercase tracking-[0.2em] font-bold py-5 rounded-sm hover:bg-white transition-all disabled:opacity-50 mt-4 overflow-hidden"
           >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                </svg>
-                Signing in…
-              </span>
-            ) : "Sign In"}
+            <span className="relative z-10">
+              {loading ? "Authenticating..." : "Authorize Access"}
+            </span>
+            <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
           </button>
         </form>
 
-        <p className="text-center text-xs text-mist/40 mt-4">
-          Default credentials: admin / admin123
+        <p className="text-center font-mono text-[9px] uppercase tracking-[0.4em] text-mist/30 mt-8">
+          Secure Editorial Environment
         </p>
       </div>
     </div>

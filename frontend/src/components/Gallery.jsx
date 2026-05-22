@@ -1,7 +1,11 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 import { Lightbox } from "./Lightbox";
 import { fetchGallery } from "../api";
+import { fallbackGallery } from "../data";
+import { SmoothMedia } from "./SmoothMedia";
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(() =>
@@ -23,12 +27,7 @@ const desktopSpanClass = {
   large: "md:col-span-2 md:row-span-2",
 };
 
-const mobileAspect = {
-  normal: "aspect-[4/3]",
-  tall: "aspect-[3/4]",
-  wide: "aspect-[16/9]",
-  large: "aspect-[4/3]",
-};
+const categories = ["All", "Landscape", "Editorial", "Portrait", "Cinematography"];
 
 export function Gallery() {
   const reduce = useReducedMotion();
@@ -36,135 +35,164 @@ export function Gallery() {
   const [active, setActive] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [showAll, setShowAll] = useState(false);
+  const galleryRef = useRef(null);
 
   useEffect(() => {
     fetchGallery()
       .then((data) => {
-        if (data && Array.isArray(data)) {
-          // Shuffle ONCE right here when data arrives so it remains perfectly static during resizes
-          const randomized = [...data].sort(() => Math.random() - 0.5);
-          setItems(randomized);
+        // If data is received from API, use it. Otherwise, fall back to static.
+        if (data && Array.isArray(data) && data.length > 0) {
+          // Sort by sort_order if available, otherwise preserve order
+          const sorted = [...data].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+          setItems(sorted);
+        } else {
+          setItems(fallbackGallery);
         }
+      })
+      .catch((err) => {
+        console.error("Failed to sync gallery from admin:", err);
+        setItems(fallbackGallery);
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const filteredItems = useMemo(() => {
+    let filtered = items;
+    if (activeCategory !== "All") {
+      filtered = items.filter(
+        (item) => item.category?.toLowerCase() === activeCategory.toLowerCase()
+      );
+    }
+    return showAll ? filtered : filtered.slice(0, isMobile ? 4 : 8);
+  }, [items, activeCategory, showAll, isMobile]);
+
+  useEffect(() => {
+    if (loading || reduce) return;
+    const ctx = gsap.context(() => {
+      // Smooth header reveal
+      gsap.from(".gallery-header-text", {
+        y: 40,
+        opacity: 0,
+        duration: 1.5,
+        stagger: 0.1,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: galleryRef.current,
+          start: "top 85%",
+        }
+      });
+
+      // Optimized batch reveal for grid items
+      ScrollTrigger.batch(".gallery-item", {
+        onEnter: (batch) => gsap.to(batch, { 
+          opacity: 1, 
+          y: 0, 
+          scale: 1,
+          stagger: 0.1, 
+          overwrite: true,
+          duration: 1.2,
+          ease: "power3.out"
+        }),
+        start: "top 85%",
+      });
+    }, galleryRef);
+    return () => ctx.revert();
+  }, [loading, reduce, filteredItems]); // Added filteredItems to re-run on filter
 
   const itemKey = (item) => item._id || item.id;
   const getSpan = (item) => item.span || "tall";
 
   return (
-    <section id="gallery" className="px-6 py-24 sm:px-10 lg:px-16 lg:py-32">
-      <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <p className="font-sans text-xs uppercase tracking-[0.3em] text-accent">Gallery</p>
-          <h2 className="mt-3 font-display text-4xl text-bone sm:text-5xl">Visual archive</h2>
-          <p className="mt-4 max-w-lg font-sans text-sm text-mist">
-            A curated mix of stills and motion — tap any frame to expand.
-          </p>
-        </motion.div>
+    <section id="gallery" ref={galleryRef} className="relative z-10 px-6 py-20 lg:py-32 bg-void border-t border-white/5 overflow-hidden">
+      <div className="mx-auto max-w-[1800px] px-6 sm:px-10 lg:px-20">
+        
+        {/* Header & Filters */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-12 mb-16 sm:mb-24">
+          <div className="max-w-4xl">
+            <p className="gallery-header-text font-mono text-xs-mono sm:text-sm-mono uppercase text-accent mb-4 sm:mb-6 tracking-[0.4em] sm:tracking-[0.5em]">Archive</p>
+            <h2 className="gallery-header-text font-display text-5xl sm:text-7xl lg:text-9xl text-bone tracking-tighter leading-none mb-8 sm:mb-10">
+              Visual <span className="italic text-accent">Studies</span>
+            </h2>
+            <p className="gallery-header-text font-sans text-base sm:text-lg text-mist max-w-md leading-relaxed border-l border-white/10 pl-6 sm:pl-8">
+              A comprehensive collection of frames exploring light, form, and the human condition. Categorized by discipline and mood.
+            </p>
+          </div>
 
-        {/* ── Loading skeleton ── */}
-        {loading ? (
-          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="aspect-[3/4] rounded-sm bg-graphite animate-pulse" />
+          <div className="gallery-header-text flex flex-wrap gap-3 sm:gap-4 lg:mb-4">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => {
+                  setActiveCategory(cat);
+                  setShowAll(false);
+                }}
+                className={`font-mono text-[10px] sm:text-sm-mono uppercase px-6 sm:px-8 py-2.5 sm:py-3 rounded-sm border transition-all duration-700 ${
+                  activeCategory === cat 
+                  ? "bg-accent border-accent text-void" 
+                  : "bg-transparent border-white/10 text-mist hover:border-white/30 hover:text-bone"
+                }`}
+              >
+                {cat}              </button>
             ))}
           </div>
-        ) : items.length === 0 ? (
-          <div className="mt-14 text-center py-20 text-mist">
-            <p className="text-4xl mb-3 opacity-30">◻</p>
-            <p className="text-sm">No gallery items yet.</p>
-          </div>
-        ) : (
-          <div className="mt-14 gap-3 sm:gap-4 grid grid-cols-2 md:grid-cols-4 md:auto-rows-[200px] md:[grid-auto-flow:dense]">
-            {items.map((item, i) => {
-              const span = getSpan(item);
-              return (
-                <motion.div
-                  key={itemKey(item)}
-                  className={[
-                    "group relative overflow-hidden rounded-sm bg-graphite cursor-pointer",
-                    isMobile ? (mobileAspect[span] ?? "aspect-[3/4]") : "",
-                    desktopSpanClass[span] ?? "md:col-span-1 md:row-span-2",
-                  ].join(" ")}
-                  initial={reduce ? false : { opacity: 0, scale: 0.96 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{
-                    duration: 0.55,
-                    delay: Math.min(i * 0.04, 0.3),
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  onClick={() =>
-                    setActive({
-                      src: item.src,
-                      type: item.type,
-                      poster: item.poster,
-                      caption: item.caption,
-                    })
-                  }
-                >
-                  {/* ── Media ── */}
-                  {item.type === "video" ? (
-                    // Performance optimization: prevents background bandwidth draining
-                    <video
+        </div>
+
+        {/* Masonry Grid with Blur Reveal */}
+        <div className="relative">
+          <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 auto-rows-[300px] sm:auto-rows-[280px]">
+            <AnimatePresence mode="popLayout" initial={false}>
+              {filteredItems.map((item) => {
+                const span = getSpan(item);
+                const spanClass = desktopSpanClass[span] || desktopSpanClass.normal;
+                
+                return (
+                  <motion.div
+                    key={itemKey(item)}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className={`gallery-item relative group overflow-hidden rounded-sm cursor-pointer ${spanClass} border border-white/5 hover:border-accent/30 transition-all duration-700`}
+                    onClick={() => setActive({ src: item.src, type: item.type, poster: item.poster })}
+                  >
+                    <SmoothMedia
                       src={item.src}
-                      poster={item.poster || undefined}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      muted
-                      playsInline
-                      autoPlay
-                      loop
-                      preload="metadata"
+                      type={item.type}
+                      poster={item.poster}
+                      title={item.caption}
                     />
-                  ) : (
-                    <img
-                      src={item.src}
-                      alt={item.caption ?? ""}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  )}
-
-                  {/* ── Hover overlay ── */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-void/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 sm:transition-opacity sm:duration-400" />
-
-                  {/* ── Video play icon ── */}
-                  {item.type === "video" && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border border-white/50 bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover:border-accent/80 group-hover:bg-black/60 transition-all duration-300">
-                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-void/90 via-void/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-1000 flex flex-col justify-end p-6 sm:p-10">
+                      <p className="font-mono text-[10px] sm:text-sm-mono uppercase text-accent mb-2 sm:mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-700 tracking-[0.2em]">{item.category}</p>
+                      <p className="font-display text-2xl sm:text-3xl text-bone leading-tight translate-y-4 group-hover:translate-y-0 transition-transform duration-700 delay-75 tracking-tight">{item.caption}</p>
                     </div>
-                  )}
-
-                  {/* ── Caption ── */}
-                  {item.caption && (
-                    <div className="absolute inset-x-0 bottom-0 p-2.5 sm:p-4 sm:translate-y-2 sm:opacity-0 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 sm:transition-all sm:duration-300 bg-gradient-to-t from-void/80 to-transparent">
-                      <p className="font-sans text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-bone/90 leading-snug line-clamp-1">
-                        {item.caption}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* ── Video badge ── */}
-                  {item.type === "video" && (
-                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 font-sans text-[8px] sm:text-[9px] uppercase tracking-widest text-bone bg-black/50 backdrop-blur-sm px-1.5 py-0.5 sm:px-2 sm:py-1 border border-white/10">
-                      Video
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
-        )}
+
+          {/* Blur Overlay & Show More Button */}
+          {!showAll && items.length > (isMobile ? 4 : 8) && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-x-0 bottom-0 h-64 sm:h-96 bg-gradient-to-t from-void via-void/95 to-transparent flex items-end justify-center pb-12 sm:pb-16 pointer-events-none"
+            >
+              <button
+                onClick={() => setShowAll(true)}
+                className="group/more flex flex-col items-center gap-4 sm:gap-6 pointer-events-auto"
+              >
+                <span className="font-mono text-[10px] sm:text-sm-mono uppercase tracking-[0.4em] sm:tracking-[0.6em] text-bone group-hover:text-accent transition-all duration-700">
+                  Explore Full Archive
+                </span>
+                <div className="h-12 sm:h-20 w-[1px] bg-gradient-to-b from-accent to-transparent group-hover:h-24 sm:group-hover:h-32 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]" />
+              </button>
+            </motion.div>
+          )}
+        </div>
       </div>
 
       <AnimatePresence>
@@ -173,7 +201,6 @@ export function Gallery() {
             src={active.src}
             type={active.type}
             poster={active.poster}
-            alt={active.caption}
             onClose={() => setActive(null)}
           />
         )}

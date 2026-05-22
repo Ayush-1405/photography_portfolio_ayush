@@ -1,18 +1,34 @@
-import { useState } from "react";
-import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
-import { ScrollReveal } from "./ScrollReveal";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
-const YOUR_EMAIL = "ayushmistry1405@gmail.com"; // ← change this
+const YOUR_EMAIL = "ayushmistry1405@gmail.com";
 
 export function Contact() {
-  const reduce = useReducedMotion();
-  const [status, setStatus] = useState("idle");
   const [form, setForm] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
   });
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".contact-header-text", {
+        y: 60,
+        opacity: 0,
+        duration: 1.5,
+        stagger: 0.1,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+        }
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
 
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -32,185 +48,109 @@ export function Contact() {
       ].join("\n"),
     );
     window.location.href = `mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`;
-    setStatus("success");
   };
 
   return (
-    <section id="contact" className="px-4 py-20 sm:px-10 lg:px-16 lg:py-32">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-sm border border-white/10 bg-gradient-to-br from-graphite to-void">
-        <div className="grid lg:grid-cols-2">
-          {/* ── Left column ── */}
-          <div className="p-8 sm:p-10 lg:p-14 border-b border-white/10 lg:border-b-0 lg:border-r">
-            <ScrollReveal>
-              <p className="font-sans text-xs uppercase tracking-[0.3em] text-accent">
-                Contact
+    <section id="contact" ref={sectionRef} className="relative z-10 bg-void px-6 py-20 lg:py-32 overflow-hidden border-t border-white/5">
+      <div className="mx-auto max-w-[1800px] px-6 sm:px-10 lg:px-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-20">
+          
+          {/* Left Column: Typography */}
+          <div className="lg:col-span-7">
+            <p className="contact-header-text font-mono text-xs-mono sm:text-sm-mono uppercase text-accent mb-4 sm:mb-6 tracking-[0.4em] sm:tracking-[0.5em]">Inquiries</p>
+            <h2 className="contact-header-text font-display text-5xl sm:text-7xl lg:text-[8vw] text-bone tracking-tighter leading-[0.85] mb-8 sm:mb-10">
+              Let's create<br />
+              <span className="italic pl-8 sm:pl-32">Magic.</span>
+            </h2>
+            
+            <div className="max-w-md space-y-8 sm:space-y-10">
+              <p className="contact-header-text font-sans text-base sm:text-lg text-mist leading-relaxed">
+                Currently accepting new commissions for editorial, fashion, and commercial projects. If you have a vision that requires a cinematic eye and high-end execution, I'd love to hear from you.
               </p>
-              <h2 className="mt-4 font-display text-3xl text-bone sm:text-4xl lg:text-5xl leading-tight">
-                Let&apos;s build something cinematic together.
-              </h2>
-              <p className="mt-5 font-sans text-sm leading-relaxed text-mist">
-                Tell me about your timeline, location, and the feeling you want
-                the images to carry. I reply within two business days.
-              </p>
+              
+              <div className="contact-header-text space-y-4 sm:space-y-5">
+                <a 
+                  href={`mailto:${YOUR_EMAIL}`}
+                  className="block font-display text-2xl sm:text-3xl lg:text-5xl text-bone hover:text-accent transition-colors break-words"
+                >
+                  {YOUR_EMAIL}
+                </a>
+                <p className="font-mono text-[10px] sm:text-xs-mono uppercase text-mist tracking-widest">
+                  Worldwide Commissions
+                </p>
+              </div>
 
-              <dl className="mt-8 space-y-4 font-sans text-sm">
-                <div className="flex items-start gap-3">
-                  <dt className="text-[10px] uppercase tracking-widest text-mist w-16 sm:w-20 pt-0.5 shrink-0">
-                    Email
-                  </dt>
-                  <dd>
-                    <a
-                      href={`mailto:${YOUR_EMAIL}`}
-                      className="text-bone hover:text-accent transition-colors break-all"
-                    >
-                      {YOUR_EMAIL}
-                    </a>
-                  </dd>
-                </div>
-                <div className="flex items-start gap-3">
-                  <dt className="text-[10px] uppercase tracking-widest text-mist w-16 sm:w-20 pt-0.5 shrink-0">
-                    Based in
-                  </dt>
-                  <dd className="text-bone">Ahmedabad, India</dd>
-                </div>
-                <div className="flex items-start gap-3">
-                  <dt className="text-[10px] uppercase tracking-widest text-mist w-16 sm:w-20 pt-0.5 shrink-0">
-                    Available
-                  </dt>
-                  <dd className="flex items-center gap-2 text-emerald-400">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                    Open for commissions
-                  </dd>
-                </div>
-              </dl>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                {[
-                  { label: "Instagram", href: "https://www.instagram.com/theayushmistry24/" },
-                  { label: "Behance", href: "#" },
-                  { label: "LinkedIn", href: "#" },
-                ].map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    className="font-sans text-[10px] uppercase tracking-widest text-mist border border-white/10 px-4 py-2 hover:text-accent hover:border-accent transition-all duration-300"
-                  >
-                    {s.label}
+              {/* <div className="contact-header-text flex flex-wrap gap-6 sm:gap-10 pt-8 sm:pt-10 border-t border-white/5">
+                {["Instagram", "Behance", "LinkedIn"].map((social) => (
+                  <a key={social} href="#" className="font-mono text-[10px] sm:text-xs-mono uppercase text-mist hover:text-accent transition-colors tracking-widest">
+                    {social}
                   </a>
                 ))}
+              </div> */}
+            </div>
+          </div>
+
+          {/* Right Column: Minimal Form */}
+          <div className="lg:col-span-5 pt-10 lg:pt-20">
+            <form onSubmit={handleSubmit} className="space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="relative group">
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Your Name"
+                    className="w-full bg-transparent border-b border-white/10 py-5 font-sans text-lg text-bone focus:outline-none focus:border-accent transition-colors placeholder:text-mist/30"
+                  />
+                </div>
+                <div className="relative group">
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="Email Address"
+                    className="w-full bg-transparent border-b border-white/10 py-5 font-sans text-lg text-bone focus:outline-none focus:border-accent transition-colors placeholder:text-mist/30"
+                  />
+                </div>
               </div>
-            </ScrollReveal>
+              
+              <div className="relative group">
+                <input
+                  type="text"
+                  name="subject"
+                  value={form.subject}
+                  onChange={handleChange}
+                  placeholder="Subject / Project Type"
+                  className="w-full bg-transparent border-b border-white/10 py-5 font-sans text-lg text-bone focus:outline-none focus:border-accent transition-colors placeholder:text-mist/30"
+                />
+              </div>
+
+              <div className="relative group">
+                <textarea
+                  name="message"
+                  required
+                  rows={4}
+                  value={form.message}
+                  onChange={handleChange}
+                  placeholder="Tell me about your vision..."
+                  className="w-full bg-transparent border-b border-white/10 py-5 font-sans text-lg text-bone focus:outline-none focus:border-accent transition-colors placeholder:text-mist/30 resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="group/btn relative inline-flex items-center gap-8 font-mono text-sm-mono uppercase text-bone overflow-hidden"
+              >
+                <span>Send Message</span>
+                <span className="h-[1px] w-12 bg-accent transition-all duration-500 group-hover/btn:w-24" />
+              </button>
+            </form>
           </div>
 
-          {/* ── Right column (Form) ── */}
-          <div className="p-8 sm:p-10 lg:p-14 bg-ink/30">
-            <AnimatePresence mode="wait">
-              {status === "idle" ? (
-                <motion.form
-                  key="form"
-                  initial={reduce ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onSubmit={handleSubmit}
-                  className="space-y-6"
-                >
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="font-sans text-[10px] uppercase tracking-widest text-mist">
-                        Name
-                      </label>
-                      <input
-                        required
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        className="w-full bg-void border-white/10 px-4 py-3 text-bone font-sans text-sm focus:border-accent outline-none transition-colors"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="font-sans text-[10px] uppercase tracking-widest text-mist">
-                        Email
-                      </label>
-                      <input
-                        required
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        className="w-full bg-void border-white/10 px-4 py-3 text-bone font-sans text-sm focus:border-accent outline-none transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="subject" className="font-sans text-[10px] uppercase tracking-widest text-mist">
-                      Subject
-                    </label>
-                    <select
-                      id="subject"
-                      name="subject"
-                      value={form.subject}
-                      onChange={handleChange}
-                      className="w-full bg-void border-white/10 px-4 py-3 text-bone font-sans text-sm focus:border-accent outline-none transition-colors appearance-none"
-                    >
-                      <option value="">Select service</option>
-                      <option value="Editorial">Editorial</option>
-                      <option value="Landscape">Landscape & Travel</option>
-                      <option value="Portrait">Portrait & Lifestyle</option>
-                      <option value="Other">Other Inquiry</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="font-sans text-[10px] uppercase tracking-widest text-mist">
-                      Message
-                    </label>
-                    <textarea
-                      required
-                      id="message"
-                      name="message"
-                      rows={5}
-                      value={form.message}
-                      onChange={handleChange}
-                      className="w-full bg-void border-white/10 px-4 py-3 text-bone font-sans text-sm focus:border-accent outline-none transition-colors resize-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="group flex w-full items-center justify-center gap-3 bg-bone px-8 py-4 font-sans text-xs uppercase tracking-[0.3em] text-void transition-all hover:bg-accent"
-                  >
-                    Send message
-                    <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
-                  </button>
-                </motion.form>
-              ) : (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex h-full flex-col items-center justify-center text-center p-6"
-                >
-                  <div className="h-16 w-16 rounded-full border border-accent/20 bg-accent/5 flex items-center justify-center mb-6">
-                    <span className="text-2xl text-accent">✓</span>
-                  </div>
-                  <h3 className="font-display text-2xl text-bone">Message prepped.</h3>
-                  <p className="mt-3 font-sans text-sm text-mist max-w-xs mx-auto">
-                    Your email client should open shortly. If not, feel free to email me directly at {YOUR_EMAIL}.
-                  </p>
-                  <button
-                    onClick={() => setStatus("idle")}
-                    className="mt-8 font-sans text-[10px] uppercase tracking-widest text-accent hover:text-bone transition-colors"
-                  >
-                    Send another
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </div>
       </div>
     </section>

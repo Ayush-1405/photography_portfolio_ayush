@@ -36,9 +36,13 @@ export default function Gallery() {
   /* ── data ── */
   async function load() {
     setLoading(true);
+    setError("");
     try {
       const data = await getGallery();
       setItems(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load gallery:", err);
+      setError("Failed to synchronize with database. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -66,6 +70,7 @@ export default function Gallery() {
     });
     setMediaFile(null);
     setPosterFile(null);
+    setPosterPreview(item.poster || null);
     setError("");
     setShowModal(true);
   }
@@ -146,36 +151,37 @@ export default function Gallery() {
 
   /* ════════════════════════════════════════════════════════════ */
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="max-w-7xl animate-in fade-in duration-700">
 
       {/* ── Page header ── */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-bone">Gallery</h1>
-          <p className="text-xs sm:text-sm text-mist mt-0.5">
-            {items.length} item{items.length !== 1 ? "s" : ""}
+          <p className="font-mono text-xs-mono uppercase text-accent mb-2 tracking-[0.3em]">Archive Management</p>
+          <h1 className="font-display text-4xl lg:text-5xl text-bone">Visual Gallery</h1>
+          <p className="font-sans text-sm text-mist/60 mt-2">
+            You have {items.length} item{items.length !== 1 ? "s" : ""} in your extended archive.
           </p>
         </div>
         <button
           onClick={openCreate}
-          className="bg-accent text-ink text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-lg hover:bg-accent/90 active:scale-95 transition-all flex items-center gap-1.5"
+          className="group relative inline-flex items-center gap-4 font-mono text-xs-mono uppercase text-bone px-8 py-4 border border-accent/30 hover:border-accent transition-all duration-500 overflow-hidden"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          <span className="hidden sm:inline">Add Item</span>
-          <span className="sm:hidden">Add</span>
+          <span className="relative z-10 flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Add Archive Item
+          </span>
+          <div className="absolute inset-0 bg-accent/5 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
         </button>
       </div>
 
       {/* ── Filter tabs ── */}
-      <div className="flex gap-1.5 mb-5 flex-wrap">
+      <div className="flex gap-3 mb-10 overflow-x-auto pb-2 scrollbar-hide">
         {["all", "image", "video"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`text-[11px] sm:text-xs px-2.5 sm:px-3 py-1.5 rounded-md border transition-colors capitalize ${filter === f
-              ? "bg-accent/10 text-accent border-accent/30"
+            className={`font-mono text-[10px] uppercase tracking-widest px-6 py-2.5 rounded-sm border transition-all duration-500 shrink-0 ${filter === f
+              ? "bg-accent border-accent text-void"
               : "text-mist border-white/10 hover:text-bone hover:border-white/20"
               }`}
           >
@@ -186,57 +192,62 @@ export default function Gallery() {
 
       {/* ── Grid ── */}
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="bg-graphite border border-white/5 rounded-lg overflow-hidden animate-pulse">
+            <div key={i} className="bg-ink border border-white/5 rounded-sm overflow-hidden animate-pulse">
               <div className="aspect-square bg-white/5" />
-              <div className="p-2.5"><div className="h-2 bg-white/5 rounded w-3/4" /></div>
+              <div className="p-4"><div className="h-2 bg-white/5 rounded w-3/4" /></div>
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 sm:py-24 text-mist">
-          <svg className="w-10 h-10 mx-auto mb-3 opacity-20" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
+        <div className="text-center py-32 bg-ink border border-dashed border-white/10 rounded-sm">
+          <svg className="w-12 h-12 mx-auto mb-6 text-accent/20" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
             <rect x="3" y="3" width="18" height="18" rx="1" />
             <circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
           </svg>
-          <p className="text-sm">{filter === "all" ? "No gallery items yet." : `No ${filter}s yet.`}</p>
+          <p className="font-display text-2xl text-bone mb-2">
+            {filter === "all" ? "No archive items yet." : `No ${filter}s found.`}
+          </p>
           {filter === "all" && (
-            <button onClick={openCreate} className="mt-3 text-accent text-sm hover:underline">
-              Add your first item →
+            <button onClick={openCreate} className="text-accent font-mono text-xs uppercase tracking-widest hover:underline underline-offset-8 mt-4">
+              Add Archive Item →
             </button>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filtered.map((item) => (
-            <div key={item._id} className="bg-graphite border border-white/5 rounded-lg overflow-hidden">
-              {/* thumbnail — relative so MediaPreview's absolute works */}
-              <div className="aspect-square relative bg-black">
-                <MediaPreview src={item.src} type={item.type} poster={item.poster} />
-                <div className="absolute top-1.5 right-1.5">
-                  <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border backdrop-blur-sm ${item.type === "video"
-                    ? "text-blue-400 border-blue-400/30 bg-black/60"
-                    : "text-accent border-accent/30 bg-black/60"
+            <div key={item._id} className="group bg-ink border border-white/5 rounded-sm overflow-hidden hover:border-accent/30 transition-all duration-700">
+              <div className="aspect-square relative bg-void overflow-hidden">
+                <img 
+                  src={item.src} 
+                  className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
+                  alt=""
+                />
+                <div className="absolute top-2 right-2">
+                  <span className={`text-[9px] font-mono uppercase tracking-[0.15em] px-2 py-1 rounded-sm border backdrop-blur-md ${item.type === "video"
+                    ? "text-accent border-accent/30 bg-void/60"
+                    : "text-mist border-white/10 bg-void/60"
                     }`}>
                     {item.type}
                   </span>
                 </div>
               </div>
-              <div className="p-2 sm:p-2.5">
+              <div className="p-5">
                 {item.caption && (
-                  <p className="text-[11px] sm:text-xs text-mist truncate mb-1.5">{item.caption}</p>
+                  <p className="text-bone font-display text-lg truncate mb-3">{item.caption}</p>
                 )}
-                <div className="flex items-center justify-between gap-1">
-                  <span className="text-[9px] text-mist/50 uppercase tracking-wider shrink-0">{item.span}</span>
-                  <div className="flex gap-1">
+                <div className="flex items-center justify-between border-t border-white/5 pt-4">
+                  <span className="font-mono text-[9px] text-mist/40 uppercase tracking-widest">{item.span}</span>
+                  <div className="flex gap-4">
                     <button onClick={() => openEdit(item)}
-                      className="text-[10px] text-mist hover:text-bone px-1.5 py-0.5 rounded hover:bg-white/5 transition-colors">
+                      className="font-mono text-[10px] uppercase tracking-widest text-mist hover:text-accent transition-colors">
                       Edit
                     </button>
                     <button onClick={() => setDeleteConfirm(item)}
-                      className="text-[10px] text-red-400/60 hover:text-red-400 px-1.5 py-0.5 rounded hover:bg-red-400/5 transition-colors">
-                      ✕
+                      className="font-mono text-[10px] uppercase tracking-widest text-red-400/60 hover:text-red-400 transition-colors">
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -393,22 +404,14 @@ export default function Gallery() {
           )}
 
           {/* ── Actions ── */}
-          <div className="flex gap-3 pt-2 border-t border-white/5">
-            <button type="button" onClick={() => setShowModal(false)}
-              className="flex-1 text-sm text-mist border border-white/10 rounded-lg px-4 py-2.5 hover:text-bone hover:border-white/20 transition-colors">
-              Cancel
-            </button>
+          <div className="flex gap-4 pt-10">
             <button type="submit" disabled={saving}
-              className="flex-1 text-sm bg-accent text-ink font-semibold rounded-lg px-4 py-2.5 hover:bg-accent/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {saving ? (
-                <>
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                  </svg>
-                  Uploading…
-                </>
-              ) : editing ? "Save Changes" : "Add Item"}
+              className="flex-1 bg-accent text-void font-mono text-xs uppercase tracking-[0.2em] font-bold py-5 rounded-sm hover:bg-white transition-all disabled:opacity-50">
+              {saving ? "Saving..." : "Commit Item"}
+            </button>
+            <button type="button" onClick={() => setShowModal(false)}
+              className="flex-1 border border-white/10 text-mist font-mono text-xs uppercase tracking-[0.2em] py-5 rounded-sm hover:text-bone hover:border-white/20 transition-all">
+              Cancel
             </button>
           </div>
 

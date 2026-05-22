@@ -14,38 +14,47 @@ export function Lightbox({ src, type = "image", poster, alt = "", onClose }) {
     <AnimatePresence>
       {src && (
         <motion.div
-          className="fixed inset-0 z-[150] flex items-center justify-center bg-void/95 backdrop-blur-md p-4 sm:p-10"
+          className="fixed inset-0 z-[150] flex items-center justify-center bg-void/98 backdrop-blur-xl p-4 sm:p-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.92, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="relative max-w-5xl w-full"
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 10 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="relative max-w-6xl w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            {type === "video" ? (
-              <video
-                src={src}
-                poster={poster}
-                controls
-                autoPlay
-                preload="auto"
-                className="w-full max-h-[80vh] rounded-sm object-contain"
-              />
-            ) : (
-              <img src={src} alt={alt} crossOrigin="anonymous" className="w-full max-h-[85vh] object-contain rounded-sm" />
-            )}
+            <div className="relative group/lb overflow-hidden rounded-sm bg-graphite/20">
+              {type === "video" ? (
+                <video
+                  src={src}
+                  poster={poster}
+                  controls
+                  autoPlay
+                  preload="auto"
+                  className="w-full max-h-[85vh] object-contain"
+                />
+              ) : (
+                <img 
+                  src={src} 
+                  alt={alt} 
+                  crossOrigin="anonymous" 
+                  className="w-full max-h-[85vh] object-contain shadow-2xl" 
+                />
+              )}
+            </div>
+            
             <button
               onClick={onClose}
-              className="absolute -top-10 right-0 font-sans text-xs uppercase tracking-[0.3em] text-mist hover:text-bone transition-colors"
+              className="absolute -top-12 right-0 flex items-center gap-3 font-mono text-xs-mono uppercase text-mist hover:text-accent transition-colors group/close"
             >
-              Close ✕
+              <span className="opacity-0 group-hover/close:opacity-100 transition-opacity">Close</span>
+              <span className="text-xl">✕</span>
             </button>
           </motion.div>
         </motion.div>

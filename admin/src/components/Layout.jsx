@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: (
@@ -38,17 +39,6 @@ export default function Layout() {
     setSidebarOpen(false);
   }, [location.pathname]);
 
-  // Close sidebar on outside click
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    function handler(e) {
-      if (e.target.closest("#sidebar") || e.target.closest("#hamburger")) return;
-      setSidebarOpen(false);
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [sidebarOpen]);
-
   function logout() {
     localStorage.removeItem("admin_token");
     navigate("/login");
@@ -56,26 +46,21 @@ export default function Layout() {
 
   const SidebarContent = () => (
     <>
-      <div className="px-5 py-5 border-b border-white/5 flex items-center justify-between">
-        <div>
-          <p className="font-sans text-bone font-semibold tracking-wide text-sm">
-            Ayush<span className="text-accent">.</span>Admin
-          </p>
-          <p className="text-[11px] text-mist mt-0.5">Portfolio Manager</p>
+      <div className="px-8 py-10">
+        <div className="group flex items-center gap-3">
+          <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center text-void font-display text-xl font-bold transition-transform group-hover:scale-110 duration-500">
+            A
+          </div>
+          <div>
+            <p className="font-display text-bone font-medium tracking-tight text-lg">
+              Ayush<span className="text-accent italic">.</span>Mistry
+            </p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-accent/60">Portfolio Admin</p>
+          </div>
         </div>
-        {/* Close button — mobile only */}
-        <button
-          onClick={() => setSidebarOpen(false)}
-          className="md:hidden text-mist hover:text-bone p-1 rounded transition-colors"
-          aria-label="Close menu"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 px-4 space-y-1">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -83,86 +68,91 @@ export default function Layout() {
             end={item.to === "/"}
             className={({ isActive }) =>
               [
-                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors",
+                "flex items-center gap-4 px-4 py-3.5 rounded-sm text-xs font-mono uppercase tracking-widest transition-all duration-500",
                 isActive
-                  ? "bg-accent/10 text-accent"
-                  : "text-mist hover:text-bone hover:bg-white/5",
+                  ? "bg-accent/5 text-accent border-r-2 border-accent"
+                  : "text-mist hover:text-bone hover:bg-white/5 hover:pl-6",
               ].join(" ")
             }
           >
-            {item.icon}
+            <span className="opacity-70">{item.icon}</span>
             {item.label}
           </NavLink>
         ))}
       </nav>
 
-      <div className="px-3 py-4 border-t border-white/5">
+      <div className="px-6 py-8">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-mist hover:text-bone hover:bg-white/5 transition-colors"
+          className="w-full flex items-center gap-4 px-4 py-3.5 rounded-sm text-xs font-mono uppercase tracking-widest text-mist hover:text-red-400 hover:bg-red-400/5 transition-all duration-500"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
           </svg>
-          Logout
+          Sign Out
         </button>
       </div>
     </>
   );
 
   return (
-    <div className="flex min-h-screen bg-ink">
+    <div className="flex min-h-screen bg-void text-bone selection:bg-accent/30 selection:text-bone">
 
       {/* ── Desktop sidebar ─────────────────────────────── */}
-      <aside className="hidden md:flex w-56 shrink-0 bg-graphite border-r border-white/5 flex-col">
+      <aside className="hidden lg:flex w-72 shrink-0 bg-ink border-r border-white/5 flex-col sticky top-0 h-screen">
         <SidebarContent />
       </aside>
 
       {/* ── Mobile overlay + drawer ──────────────────────── */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          {/* backdrop */}
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          {/* drawer */}
-          <aside
-            id="sidebar"
-            className="absolute left-0 top-0 h-full w-64 bg-graphite border-r border-white/5 flex flex-col z-50"
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] lg:hidden"
           >
-            <SidebarContent />
-          </aside>
-        </div>
-      )}
+            {/* backdrop */}
+            <div className="absolute inset-0 bg-void/90 backdrop-blur-md" onClick={() => setSidebarOpen(false)} />
+            {/* drawer */}
+            <motion.aside
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-0 top-0 h-full w-72 bg-ink border-r border-white/5 flex flex-col z-[101]"
+            >
+              <div className="absolute top-6 right-6">
+                <button onClick={() => setSidebarOpen(false)} className="text-mist hover:text-bone">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <SidebarContent />
+            </motion.aside>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Main content ─────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0">
 
         {/* Mobile top bar */}
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-graphite border-b border-white/5 sticky top-0 z-30">
+        <header className="lg:hidden flex items-center justify-between px-6 py-5 bg-ink border-b border-white/5 sticky top-0 z-[90]">
           <button
-            id="hamburger"
             onClick={() => setSidebarOpen(true)}
-            className="text-mist hover:text-bone p-1.5 rounded transition-colors"
-            aria-label="Open menu"
+            className="text-mist hover:text-bone p-1"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
-          <p className="font-sans text-bone font-semibold text-sm">
-            Ayush<span className="text-accent">.</span>Admin
+          <p className="font-display text-bone font-medium tracking-tight text-lg">
+            Ayush<span className="text-accent italic">.</span>Mistry
           </p>
-          <button
-            onClick={logout}
-            className="text-mist hover:text-bone p-1.5 rounded transition-colors"
-            aria-label="Logout"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
-            </svg>
-          </button>
+          <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-void font-display text-sm font-bold">A</div>
         </header>
 
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 p-6 lg:p-12 max-w-[1600px] mx-auto w-full">
           <Outlet />
         </main>
       </div>

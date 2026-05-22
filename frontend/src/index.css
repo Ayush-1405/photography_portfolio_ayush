@@ -3,20 +3,192 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --void: #0a0a0a;
+    --bone: #f5f5f7;
+    --accent: #d4af37;
+    --mist: rgba(245, 245, 247, 0.6);
+    --graphite: #1a1a1a;
+    --ink: #111111;
+  }
+
+  [data-theme="void"] {
+    --void: #0a0a0a;
+    --bone: #f5f5f7;
+    --accent: #d4af37;
+    --mist: rgba(245, 245, 247, 0.6);
+    --graphite: #1a1a1a;
+    --ink: #111111;
+  }
+
+  [data-theme="bone"] {
+    --void: #f5f5f7;
+    --bone: #0a0a0a;
+    --mist: rgba(10, 10, 10, 0.6);
+    --graphite: #e5e5e7;
+    --ink: #eeeeef;
+    --accent: #b8860b; /* Slightly deeper gold for light mode visibility */
+  }
+
+  [data-theme="clay"] {
+    --void: #23211f;
+    --bone: #e8e2d9;
+    --mist: rgba(232, 226, 217, 0.6);
+    --graphite: #2f2c29;
+    --ink: #1a1816;
+    --accent: #d4af37;
+  }
+
   html {
-    scroll-behavior: smooth;
+    @apply antialiased scroll-smooth selection:bg-accent selection:text-void;
+    background-color: var(--void);
+    color: var(--bone);
   }
+
   body {
-    @apply bg-ink text-bone antialiased;
+    @apply overflow-x-hidden;
+    background-color: var(--void);
+    color: var(--bone);
+    min-height: 100vh;
   }
-  ::selection {
-    @apply bg-accent/30 text-bone;
+
+  /* Targeted transitions for smooth theme change without killing performance */
+  body, 
+  section, 
+  nav, 
+  footer, 
+  header,
+  main,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  span,
+  a {
+    transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                color 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Cinematic Grain Texture Overlay */
+  .grain-overlay {
+    pointer-events: none;
+    position: fixed;
+    inset: -100%;
+    z-index: 999;
+    opacity: 0.04;
+    background-image: url("https://res.cloudinary.com/dvwf9p4ve/image/upload/v1700000000/grain_texture.png"); /* Fallback or specific grain asset */
+    animation: grain 8s steps(10) infinite;
+  }
+
+  @keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -10%); }
+    20% { transform: translate(-15%, 5%); }
+    30% { transform: translate(7%, -25%); }
+    40% { transform: translate(-5%, 25%); }
+    50% { transform: translate(-15%, 10%); }
+    60% { transform: translate(15%, 0%); }
+    70% { transform: translate(0%, 15%); }
+    80% { transform: translate(3%, 35%); }
+    90% { transform: translate(-10%, 10%); }
+  }
+
+  /* Hardware acceleration for smooth scrolling/animations */
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-scrolling iframe {
+    pointer-events: none;
+  }
+
+  /* GPU Acceleration hints for high-frequency elements */
+  .hero-image,
+  .testimonial-card,
+  .project-card,
+  .gallery-item,
+  .horizontal-reel-item,
+  .strip-card,
+  .parallax-target {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Optimize layout shifts */
+  img {
+    content-visibility: auto;
+  }
+
+  /* Exclude heavy animation elements from transition to prevent lag */
+  .gsap-animated,
+  .testimonial-card,
+  .project-card,
+  .strip-card,
+  .gallery-item,
+  video,
+  img {
+    transition: none !important;
+  }
+}
+
+@layer base {
+
+  /* Grainy texture overlay */
+  .noise::before {
+    content: "";
+    position: fixed;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 9999;
+    animation: grain 8s steps(10) infinite;
+  }
+
+  /* Custom minimal premium scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #030303;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(212, 178, 111, 0.15);
+    border-radius: 10px;
+    transition: background 0.3s;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 178, 111, 0.35);
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  .glass-card {
+    @apply bg-white/[0.02] border border-white/10 backdrop-blur-md;
+  }
+  
+  .glass-card-hover {
+    @apply hover:bg-white/[0.04] hover:border-accent/30 transition-all duration-500;
   }
 }
 

@@ -4,14 +4,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#0a0a0a",
-        graphite: "#1a1a1a",
-        bone: "#f0ece4",
-        mist: "#9a9590",
-        accent: "#c8a96e",
+        void: "#030303",
+        ink: "#080808",
+        graphite: "#121212",
+        mist: "#888888",
+        bone: "#F5F5F3",
+        accent: "#D4B26F",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["\"Inter\"", "system-ui", "sans-serif"],
+        display: ["\"Cormorant Garamond\"", "serif"],
+        mono: ["\"JetBrains Mono\"", "monospace"],
+      },
+      fontSize: {
+        'xs-mono': ['14px', { letterSpacing: '0.4em' }],
+        'sm-mono': ['16px', { letterSpacing: '0.4em' }],
+        'base-mono': ['18px', { letterSpacing: '0.4em' }],
       },
     },
   },

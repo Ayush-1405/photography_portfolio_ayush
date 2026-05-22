@@ -4,105 +4,119 @@ export const heroImage =
 export const introPortrait = "/intro.jpeg";
 
 export const projects = [
+
   {
     id: "p1",
-    title: "Chale Fir",
-    category: "Cinematography",
-    year: "2025",
-    description: "A day in dakor with friends and transitions.",
-    src: "/project/lv_0_20250730175624.mp4",
-    type: "video",
-  },
-  {
-    id: "p2",
-    title: "Dakor Temple",
-    category: "Street Film",
-    year: "2025",
-    description: "A temple with the magic and religens .",
-    src: "/project/lv_0_20250815211113.mp4",
-    type: "video",
-  },
-  {
-    id: "p3",
-    title: "The Last Day",
-    category: "Experimental",
-    year: "2026",
-    description: "a short film by ayush mistry.",
-    src: "/project/the-last-day.mp4",
-    type: "video",
-    poster: "/gallery/IMG_20260329_144845047_HDR.jpg.jpeg",
-  },
-  {
-    id: "p4",
     title: "The Nature",
     category: "Landscape",
     year: "2026",
-    description: "Dawn light across ridgelines — a study in negative space and atmosphere.",
+    description: "Dawn light across ridgelines — a study in negative space and atmosphere. This series captures the silent conversation between the earth and the first light of day, highlighting the minimalist beauty of untouched terrains and the ephemeral quality of mountain mists.",
     src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80",
     type: "image",
   },
   {
-    id: "p5",
+    id: "p2",
     title: "Urban Pulse",
     category: "Editorial",
     year: "2025",
-    description: "Night geometry and reflections in the city core.",
+    description: "Night geometry and reflections in the city core. This project examines the architectural symmetry of modern urban environments under the cloak of night, where artificial light creates a new, cinematic reality through glass, steel, and shadow.",
     src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1600&q=80",
     type: "image",
   },
   {
-    id: "p6",
+    id: "p3",
     title: "Coastal Drift",
     category: "Seascape",
     year: "2024",
-    description: "Long exposures where tide and sky merge into one tone.",
+    description: "Long exposures where tide and sky merge into one tone. A visual exploration of the horizon line and the meditative quality of the ocean, using extended shutter speeds to transform chaotic waves into ethereal, painterly textures.",
     src: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?auto=format&fit=crop&w=1600&q=80",
     type: "image",
   },
 ];
 
 export const stripImages = [
-  "/image-1.jpg",
-  "/image-2.jpg",
-  
-  "/image-3.jpg",
-  "/image-4.jpg",
-  "/image-5.jpg",
-  "/image-6.jpg",
+  {
+    src: "/image-1.jpg",
+    title: "Ethereal Silence",
+    location: "Icelandic Highlands",
+    year: "2026",
+    metadata: "F/2.8 · 1/200 · ISO 100",
+  },
+  {
+    src: "/image-2.jpg",
+    title: "Urban Geometry",
+    location: "Tokyo, Shinjuku",
+    year: "2025",
+    metadata: "F/1.4 · 1/500 · ISO 400",
+  },
+  {
+    src: "/image-3.jpg",
+    title: "Golden Hour Drift",
+    location: "Amalfi Coast",
+    year: "2026",
+    metadata: "F/4.0 · 1/1000 · ISO 200",
+  },
+  {
+    src: "/image-4.jpg",
+    title: "Nocturnal Pulse",
+    location: "New York City",
+    year: "2024",
+    metadata: "F/1.8 · 1/60 · ISO 1600",
+  },
+  {
+    src: "/image-5.jpg",
+    title: "Minimalist Peak",
+    location: "Swiss Alps",
+    year: "2025",
+    metadata: "F/8.0 · 1/250 · ISO 100",
+  },
+  {
+    src: "/image-6.jpg",
+    title: "Coastal Whispers",
+    location: "Big Sur, California",
+    year: "2026",
+    metadata: "F/5.6 · 1/400 · ISO 200",
+  },
 ];
 
 export const services = [
   {
     id: "editorial",
     title: "Editorial",
-    tagline: "Stories that belong in print.",
+    tagline: "Stories that belong in print. A blend of fashion, lifestyle, and art direction.",
     items: [
-      "Magazine & lookbook shoots",
-      "Brand campaigns",
-      "Art direction collaboration",
-      "Full retouching & delivery",
+      "Magazine & lookbook shoots with narrative depth",
+      "Brand campaigns that resonate emotionally",
+      "Art direction collaboration from concept to final",
+      "Full high-end retouching & digital delivery",
+      "Social media content strategy & creation",
+      "Print production management & consulting",
     ],
   },
   {
     id: "landscape",
     title: "Landscape & Travel",
-    tagline: "Places remembered the right way.",
+    tagline: "Places remembered the right way. Capturing the soul of destinations.",
     items: [
-      "Destination commissions",
-      "Fine-art prints available",
-      "Multi-day expeditions",
-      "Licensing for commercial use",
+      "Global destination commissions for tourism boards",
+      "Exclusive fine-art prints for collectors",
+      "Multi-day expeditions into remote terrains",
+      "Licensing for high-end commercial use",
+      "Aviation & drone cinematography",
+      "Environmental storytelling workshops",
     ],
   },
   {
     id: "portrait",
     title: "Portrait & Lifestyle",
-    tagline: "Light that tells the truth.",
+    tagline: "Light that tells the truth. Honest moments captured with cinematic flair.",
     items: [
-      "Individual & couple sessions",
-      "Corporate headshots",
-      "Studio or on-location",
-      "Same-week online gallery",
+      "Individual & couple sessions with soul",
+      "High-end corporate headshots for leaders",
+      "Studio or on-location cinematic lighting",
+      "Same-week online gallery for client review",
+      "Lifestyle branding for entrepreneurs",
+      "Documentary-style event coverage",
     ],
   },
 ];
@@ -129,13 +143,27 @@ export const testimonials = [
     author: "Ananya Sharma",
     role: "Editor, Terrain Magazine",
   },
+  {
+    id: "4",
+    quote:
+      "A visionary with the lens. Ayush doesn't just take photos; he captures the very atmosphere of a space.",
+    author: "Vikram Sethi",
+    role: "Architect, Studio Verse",
+  },
+  {
+    id: "5",
+    quote:
+      "His technical precision combined with an artistic soul resulted in a portfolio that exceeded all our expectations.",
+    author: "Saira Banu",
+    role: "Marketing Head, Luxe Living",
+  },
 ];
 
 export const stats = [
-  { value: "80 +", label: "Commissions" },
-  { value: "1", label: "Countries" },
-  { value: "3", label: "Publications" },
-  { value: "1 yr", label: "Active" },
+  { value: "120 +", label: "Global Commissions" },
+  { value: "1", label: "Countrie Covered" },
+  { value: "8", label: "Major Publications" },
+  { value: "1 + yrs", label: "Professional Years" },
 ];
 
 export const processSteps = [
@@ -167,4 +195,63 @@ export const awards = [
   "Unsplash Editorial Pick",
   "Behance Curated",
   "National Photography Week",
+];
+
+export const fallbackGallery = [
+  {
+    id: "fg1",
+    category: "Landscape",
+    src: "/image-1.jpg",
+    span: "tall",
+    caption: "Muted ridgelines under absolute calm.",
+  },
+  {
+    id: "fg2",
+    category: "Editorial",
+    src: "/image-2.jpg",
+    span: "normal",
+    caption: "Contrast study in studio light.",
+  },
+  {
+    id: "fg3",
+    category: "Portrait",
+    src: "/image-3.jpg",
+    span: "wide",
+    caption: "Intertwined shadows and quiet focus.",
+  },
+  {
+    id: "fg4",
+    category: "Landscape",
+    src: "/image-4.jpg",
+    span: "tall",
+    caption: "The rhythm of tides at twilight.",
+  },
+  {
+    id: "fg5",
+    category: "Portrait",
+    src: "/image-5.jpg",
+    span: "large",
+    caption: "Warm silhouettes on alabaster stone.",
+  },
+  {
+    id: "fg6",
+    category: "Editorial",
+    src: "/image-6.jpg",
+    span: "normal",
+    caption: "Restraint and shadow play.",
+  },
+  {
+    id: "fg7",
+    category: "Cinematography",
+    src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1600&q=80",
+    span: "wide",
+    caption: "Urban geometry at midnight.",
+  },
+  {
+    id: "fg8",
+    category: "Landscape",
+    src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80",
+    span: "tall",
+    caption: "Negative space in high altitudes.",
+  }
 ];

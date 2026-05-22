@@ -112,3 +112,16 @@ export async function deleteGalleryItem(id) {
   if (!res.ok) throw new Error(data.error || "Failed to delete gallery item");
   return data;
 }
+
+// ── Sync ──────────────────────────────────────────────────────────────────────
+
+export async function syncStaticData(payload) {
+  const res = await fetch(`${BASE}/sync/static`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to sync data");
+  return data;
+}

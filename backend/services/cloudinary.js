@@ -26,9 +26,14 @@ async function uploadToCloudinary(buffer, { folder, resource_type = "image" }) {
     const options = {
       folder,
       resource_type,
-      // For images: auto quality + format. For videos: no transformation.
+      // For large videos, we might need a longer timeout or chunked upload
+      // but upload_stream usually handles this up to 100MB-500MB depending on plan.
       ...(resource_type === "image" && {
         transformation: [{ quality: "auto", fetch_format: "auto" }],
+      }),
+      ...(resource_type === "video" && {
+        // Ensuring high-quality video upload for large files
+        chunk_size: 6000000, // 6MB chunks for large files
       }),
     };
 

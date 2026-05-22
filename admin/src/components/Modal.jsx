@@ -1,20 +1,6 @@
 import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-/**
- * Modal — bottom sheet on mobile, centered dialog on sm+.
- *
- * Layout:
- *   ┌─────────────────┐
- *   │  sticky header  │  ← always visible
- *   ├─────────────────┤
- *   │  scrollable     │  ← form fields scroll here
- *   │  body           │
- *   └─────────────────┘
- *
- * The children are responsible for rendering their own action buttons
- * inside the form (they scroll with the content, which is fine for
- * short forms). For very long forms the user just scrolls down.
- */
 export default function Modal({ open, onClose, title, children }) {
   useEffect(() => {
     if (!open) return;
@@ -27,48 +13,50 @@ export default function Modal({ open, onClose, title, children }) {
     };
   }, [open, onClose]);
 
-  if (!open) return null;
-
   return (
-    /* Backdrop */
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/75 backdrop-blur-sm"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
-    >
-      {/*
-        Card:
-        - Mobile  → slides up from bottom, rounded top corners, max 88% viewport height
-        - Desktop → centered, max 560px wide, max 85% viewport height
-        Uses flex-col so header is fixed and body scrolls independently.
-      */}
-      <div className="
-        flex flex-col
-        bg-graphite border border-white/10 shadow-2xl
-        w-full rounded-t-2xl
-        sm:rounded-xl sm:max-w-[560px]
-        max-h-[88dvh] sm:max-h-[85vh]
-      ">
-        {/* ── Sticky header ── */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-          <h2 className="text-sm font-semibold text-bone uppercase tracking-wider leading-none">
-            {title}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-mist hover:text-bone transition-colors p-1.5 -mr-1 rounded-md hover:bg-white/5"
-            aria-label="Close"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center sm:p-6 lg:p-10">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onMouseDown={onClose}
+            className="absolute inset-0 bg-void/95 backdrop-blur-xl"
+          />
 
-        {/* ── Scrollable body ── */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5">
-          {children}
+          {/* Card */}
+          <motion.div
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="relative flex flex-col bg-ink border border-white/10 shadow-2xl w-full rounded-t-sm sm:rounded-sm sm:max-w-xl max-h-[92dvh] sm:max-h-[85vh] overflow-hidden"
+          >
+            {/* ── Header ── */}
+            <div className="flex items-center justify-between px-8 py-6 border-b border-white/5 shrink-0 bg-ink">
+              <h2 className="font-mono text-xs-mono uppercase tracking-[0.3em] text-accent leading-none">
+                {title}
+              </h2>
+              <button
+                onClick={onClose}
+                className="text-mist hover:text-bone transition-all duration-500 p-2 group"
+                aria-label="Close"
+              >
+                <svg className="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* ── Body ── */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-8 py-10 scrollbar-hide">
+              {children}
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }
