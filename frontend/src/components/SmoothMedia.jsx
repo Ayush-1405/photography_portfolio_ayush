@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef, memo } from "react";
 import { motion } from "framer-motion";
+import { useTheme } from "../context/ThemeContext";
 
 const SmoothMedia = memo(({ src, type, poster, title, className = "" }) => {
   const [loaded, setLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
+  const { theme } = useTheme();
+
+  const isLightTheme = theme === "bone";
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -53,7 +57,7 @@ const SmoothMedia = memo(({ src, type, poster, title, className = "" }) => {
             ref={videoRef}
             src={isInView ? src : undefined}
             poster={poster}
-            className="h-full w-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 scale-110 parallax-target"
+            className={`h-full w-full object-cover transition-all duration-1000 group-hover:grayscale-0 scale-110 parallax-target ${isLightTheme ? 'grayscale-0' : 'grayscale'}`}
             muted
             loop
             playsInline
@@ -66,7 +70,7 @@ const SmoothMedia = memo(({ src, type, poster, title, className = "" }) => {
             alt={title}
             onLoad={handleLoaded}
             decoding="async" // Decode off-thread
-            className="h-full w-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 scale-110 parallax-target"
+            className={`h-full w-full object-cover transition-all duration-1000 group-hover:grayscale-0 scale-110 parallax-target ${isLightTheme ? 'grayscale-0' : 'grayscale'}`}
             loading="lazy"
           />
         )}

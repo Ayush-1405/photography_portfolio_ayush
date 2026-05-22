@@ -66,20 +66,21 @@
   h4,
   span,
   a {
-    transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
-                color 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
-                border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background-color 1s cubic-bezier(0.16, 1, 0.3, 1), 
+                color 1s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 1s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Cinematic Grain Texture Overlay */
+  /* Optimized Cinematic Grain */
   .grain-overlay {
     pointer-events: none;
     position: fixed;
-    inset: -100%;
+    inset: -150%;
     z-index: 999;
     opacity: 0.04;
-    background-image: url("https://res.cloudinary.com/dvwf9p4ve/image/upload/v1700000000/grain_texture.png"); /* Fallback or specific grain asset */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     animation: grain 8s steps(10) infinite;
+    will-change: transform;
   }
 
   @keyframes grain {
@@ -119,7 +120,8 @@
   .gallery-item,
   .horizontal-reel-item,
   .strip-card,
-  .parallax-target {
+  .parallax-target,
+  .nav-blur {
     will-change: transform;
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;

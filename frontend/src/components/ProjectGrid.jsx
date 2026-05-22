@@ -84,20 +84,20 @@ export function ProjectGrid() {
   const projectKey = (p) => p._id || p.id;
 
   return (
-    <section id="work" ref={gridRef} className="relative z-10 bg-void py-section-gap overflow-hidden border-b border-white/5">
+    <section id="work" ref={gridRef} className="relative z-10 bg-void py-20 lg:py-32 overflow-hidden border-b border-white/5">
       <div className="px-6 sm:px-10 lg:px-20 max-w-[1800px] mx-auto w-full">
         {/* Header Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 sm:mb-24 items-end">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 sm:mb-16 items-end">
           <div className="lg:col-span-8">
-            <p className="project-header-text font-mono text-xs-mono sm:text-sm-mono uppercase text-accent mb-4 sm:mb-6 tracking-[0.4em] sm:tracking-[0.5em]">Selected Works</p>
-            <h2 className="project-header-text font-display text-5xl sm:text-8xl lg:text-[10rem] text-bone tracking-tighter leading-none">
+            <p className="project-header-text font-mono text-xs-mono uppercase text-accent mb-3 tracking-[0.4em]">Selected Works</p>
+            <h2 className="project-header-text font-display text-5xl sm:text-7xl lg:text-8xl text-bone tracking-tighter leading-none">
               Featured<br />
-              <span className="italic pl-8 sm:pl-32 text-accent">Projects</span>
+              <span className="italic pl-8 sm:pl-24 text-accent">Projects</span>
             </h2>
           </div>
-          <div className="lg:col-span-4 lg:pb-6">
-            <p className="project-header-text font-sans text-base sm:text-lg text-mist max-w-sm leading-relaxed border-l border-white/10 pl-6 sm:pl-8">
-              A curated selection of work across fashion, architecture, and lifestyle. Each project is a deep exploration of light, narrative, and cinematic form.
+          <div className="lg:col-span-4 lg:pb-4">
+            <p className="project-header-text font-sans text-base lg:text-lg text-mist max-w-sm leading-relaxed border-l border-white/5 pl-6 opacity-70">
+              A curated selection of work across fashion, architecture, and lifestyle. Each project is a deep exploration of light and form.
             </p>
           </div>
         </div>

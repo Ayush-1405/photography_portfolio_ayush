@@ -1,12 +1,16 @@
 import { useRef, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import gsap from "gsap";
+import { useTheme } from "../context/ThemeContext";
 import { stripImages } from "../data";
 
 export function HorizontalStrip() {
   const reduce = useReducedMotion();
   const scrollContainerRef = useRef(null);
   const horizontalRef = useRef(null);
+  const { theme } = useTheme();
+
+  const isLightTheme = theme === "bone";
 
   useEffect(() => {
     if (reduce) return;
@@ -50,7 +54,7 @@ export function HorizontalStrip() {
   }, [reduce]);
 
   return (
-    <section ref={scrollContainerRef} className="relative bg-void min-h-screen lg:h-screen flex flex-col justify-center border-y border-white/5 overflow-hidden py-20 lg:py-0">
+    <section id="frames" ref={scrollContainerRef} className="relative z-10 bg-void overflow-hidden border-t border-white/5">
       <div className="px-6 sm:px-10 lg:px-20 mb-12 sm:mb-16 w-full max-w-[1800px] mx-auto">
         <p className="strip-header-text font-mono text-xs-mono sm:text-sm-mono uppercase text-accent mb-4 tracking-[0.4em]">Continuous Reel</p>
         <h2 className="strip-header-text font-display text-4xl sm:text-5xl lg:text-7xl text-bone tracking-tighter leading-none">Selected <span className="italic text-accent">Frames</span></h2>
@@ -73,7 +77,7 @@ export function HorizontalStrip() {
                 <img 
                   src={item.src} 
                   alt={item.title} 
-                  className="h-full w-full object-cover grayscale opacity-70 group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000" 
+                  className={`h-full w-full object-cover opacity-70 group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000 ${isLightTheme ? 'grayscale-0' : 'grayscale'}`}
                   loading="lazy" 
                 />
                 
@@ -93,12 +97,16 @@ export function HorizontalStrip() {
                     </div>
                     <h3 className="font-display text-3xl sm:text-4xl text-bone tracking-tight group-hover:text-accent transition-colors duration-500">{item.title}</h3>
                   </div>
-                  <div className="text-right hidden sm:block">
+                  <div className="text-right hidden lg:block">
                     <p className="font-mono text-[9px] uppercase tracking-widest text-mist/30 mb-2">Metadata Archive</p>
                     <div className="px-3 py-1 border border-white/10 rounded-full">
                       <p className="font-mono text-[10px] text-mist/60 uppercase tracking-widest">{item.metadata}</p>
                     </div>
                   </div>
+                </div>
+                {/* Mobile Metadata */}
+                <div className="lg:hidden flex items-center gap-4 border-b border-white/5 pb-4">
+                   <p className="font-mono text-[9px] text-mist/40 uppercase tracking-widest">{item.metadata}</p>
                 </div>
               </div>
             </motion.div>

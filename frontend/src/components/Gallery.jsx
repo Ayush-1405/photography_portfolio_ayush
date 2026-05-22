@@ -109,32 +109,30 @@ export function Gallery() {
       <div className="mx-auto max-w-[1800px] px-6 sm:px-10 lg:px-20">
         
         {/* Header & Filters */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-12 mb-16 sm:mb-24">
-          <div className="max-w-4xl">
-            <p className="gallery-header-text font-mono text-xs-mono sm:text-sm-mono uppercase text-accent mb-4 sm:mb-6 tracking-[0.4em] sm:tracking-[0.5em]">Archive</p>
-            <h2 className="gallery-header-text font-display text-5xl sm:text-7xl lg:text-9xl text-bone tracking-tighter leading-none mb-8 sm:mb-10">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-12 sm:mb-16">
+          <div className="max-w-3xl">
+            <p className="gallery-header-text font-mono text-xs-mono uppercase text-accent mb-3 tracking-[0.4em]">Archive</p>
+            <h2 className="gallery-header-text font-display text-5xl sm:text-7xl lg:text-8xl text-bone tracking-tighter leading-none mb-6">
               Visual <span className="italic text-accent">Studies</span>
             </h2>
-            <p className="gallery-header-text font-sans text-base sm:text-lg text-mist max-w-md leading-relaxed border-l border-white/10 pl-6 sm:pl-8">
-              A comprehensive collection of frames exploring light, form, and the human condition. Categorized by discipline and mood.
+            <p className="gallery-header-text font-sans text-base lg:text-lg text-mist max-w-md leading-relaxed border-l border-white/5 pl-6 opacity-70">
+              A comprehensive collection of frames exploring light, form, and the human condition.
             </p>
           </div>
 
-          <div className="gallery-header-text flex flex-wrap gap-3 sm:gap-4 lg:mb-4">
+          <div className="gallery-header-text flex flex-wrap gap-2 lg:mb-2">
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => {
-                  setActiveCategory(cat);
-                  setShowAll(false);
-                }}
-                className={`font-mono text-[10px] sm:text-sm-mono uppercase px-6 sm:px-8 py-2.5 sm:py-3 rounded-sm border transition-all duration-700 ${
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 font-mono text-[9px] uppercase tracking-widest transition-all rounded-full border ${
                   activeCategory === cat 
-                  ? "bg-accent border-accent text-void" 
-                  : "bg-transparent border-white/10 text-mist hover:border-white/30 hover:text-bone"
+                    ? "bg-accent text-void border-accent" 
+                    : "border-white/5 text-mist/40 hover:border-white/20 hover:text-mist"
                 }`}
               >
-                {cat}              </button>
+                {cat}
+              </button>
             ))}
           </div>
         </div>
