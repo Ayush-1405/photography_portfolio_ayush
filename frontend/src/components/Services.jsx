@@ -125,14 +125,10 @@ function ServiceCard({ svc, index }) {
 /* ─── Services ────────────────────────────────────────────────────────────── */
 export function Services() {
   return (
-    <motion.section
+    <section
       id="services"
       className="relative z-20 border-t border-white/[0.05] py-[var(--section-py)] bg-[var(--void)]"
       aria-label="Visual solutions and services"
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.9, ease: EASE }}
     >
       <div className="px-6 lg:px-20 w-full">
 
@@ -205,6 +201,6 @@ export function Services() {
         </motion.div>
 
       </div>
-    </motion.section>
+    </section>
   );
 }
