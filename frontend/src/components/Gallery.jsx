@@ -7,6 +7,8 @@ import { fetchGallery } from "../api";
 import { fallbackGallery } from "../data";
 import { SmoothMedia } from "./SmoothMedia";
 
+const EASE = [0.16, 1, 0.3, 1];
+
 function useIsMobile() {
   const [mobile, setMobile] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth < 768 : false,
@@ -105,7 +107,7 @@ export function Gallery() {
   const getSpan = (item) => item.span || "tall";
 
   return (
-    <section id="gallery" ref={galleryRef} className="relative z-10 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)] border-t border-white/5 overflow-hidden">
+    <section id="gallery" ref={galleryRef} className="relative z-20 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)] border-t border-white/5 overflow-hidden bg-[var(--void)]">
       <div className="mx-auto max-w-[var(--container-max)]">
         
         {/* Header & Filters */}
@@ -139,7 +141,7 @@ export function Gallery() {
 
         {/* Masonry Grid with Blur Reveal */}
         <div className="relative">
-          <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 auto-rows-[300px] sm:auto-rows-[280px]">
+          <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 auto-rows-[minmax(240px,auto)] sm:auto-rows-[minmax(260px,auto)]">
             <AnimatePresence mode="popLayout" initial={false}>
               {filteredItems.map((item) => {
                 const span = getSpan(item);

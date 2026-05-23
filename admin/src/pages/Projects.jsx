@@ -10,6 +10,7 @@ const EMPTY_FORM = {
   description: "",
   type: "image",
   src: "",
+  drive_link: "",
   sort_order: "0",
 };
 
@@ -88,6 +89,7 @@ export default function Projects() {
       description: item.description || "",
       type: item.type,
       src: item.src || "",
+      drive_link: item.drive_link || "",
       sort_order: String(item.sort_order ?? 0),
     });
     setMediaFile(null);
@@ -110,6 +112,7 @@ export default function Projects() {
       fd.append("description", form.description);
       fd.append("type", form.type);
       fd.append("sort_order", form.sort_order);
+      fd.append("drive_link", form.drive_link || "");
       if (mediaFile) fd.append("media", mediaFile);
       else if (form.src) fd.append("src", form.src);
       if (posterFile) fd.append("poster", posterFile);
@@ -218,6 +221,20 @@ export default function Projects() {
                 {item.description && (
                   <p className="text-sm text-mist/60 mt-4 line-clamp-2 leading-relaxed font-sans">{item.description}</p>
                 )}
+
+                {item.drive_link && (
+                  <a
+                    href={item.drive_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-4 font-mono text-[9px] uppercase tracking-widest text-accent/60 hover:text-accent transition-colors group"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    View Drive
+                  </a>
+                )}
                 
                 <div className="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-white/5">
                   <button onClick={() => openEdit(item)}
@@ -284,6 +301,21 @@ export default function Projects() {
             <textarea className="field-input resize-none" rows={2} value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Short description…" />
+          </div>
+
+          {/* Drive Link */}
+          <div>
+            <label className="field-label">
+              Project Drive Link
+              <span className="text-mist/50 normal-case font-normal ml-1 text-[10px]">optional — Google Drive, Behance, etc.</span>
+            </label>
+            <input
+              className="field-input"
+              value={form.drive_link}
+              onChange={(e) => setForm({ ...form, drive_link: e.target.value })}
+              placeholder="https://drive.google.com/…"
+              type="url"
+            />
           </div>
 
           {/* Type + Sort */}

@@ -31,6 +31,7 @@ const projectSchema = new mongoose.Schema(
     type: { type: String, enum: ["image", "video"], required: true },
     poster: { type: String, default: null },        // Cloudinary URL for poster
     poster_public_id: { type: String, default: null },
+    drive_link: { type: String, default: null },   // Google Drive / external project link
     sort_order: { type: Number, default: 0 },
   },
   { timestamps: true, collection: "projects" }

@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
 const YOUR_EMAIL = "ayushmistry1405@gmail.com";
+const EASE = [0.16, 1, 0.3, 1];
 
 export function Contact() {
   const [form, setForm] = useState({
@@ -51,7 +53,15 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" ref={sectionRef} className="relative z-10 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)] overflow-hidden border-t border-white/5">
+    <motion.section
+      id="contact"
+      ref={sectionRef}
+      className="relative z-20 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)] overflow-hidden border-t border-white/5 bg-[var(--void)]"
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.9, ease: EASE }}
+    >
       <div className="mx-auto max-w-[var(--container-max)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
           
@@ -152,6 +162,6 @@ export function Contact() {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

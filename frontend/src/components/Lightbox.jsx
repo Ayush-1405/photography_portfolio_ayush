@@ -3,15 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function Lightbox({ src, type = "image", poster, alt = "", onClose }) {
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") onClose();
-    };
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
-    // Prevent body scroll
     document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     };
   }, [onClose]);
 
@@ -19,59 +16,76 @@ export function Lightbox({ src, type = "image", poster, alt = "", onClose }) {
     <AnimatePresence>
       {src && (
         <motion.div
-          className="fixed inset-0 z-[150] flex items-center justify-center bg-void/98 backdrop-blur-2xl p-4 sm:p-10"
+          /* z-[300] — above grain-overlay (z-200) and nav (z-100) */
+          className="fixed inset-0 z-[300] flex flex-col items-center justify-center bg-[#0a0a0a]/97 backdrop-blur-2xl p-4 sm:p-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image lightbox"
         >
-          {/* Decorative Corner Borders for Cinematic Feel */}
-          <div className="absolute top-10 left-10 w-20 h-20 border-t border-l border-accent/20 pointer-events-none" />
-          <div className="absolute bottom-10 right-10 w-20 h-20 border-b border-r border-accent/20 pointer-events-none" />
+          {/* Corner accents — hidden on very small screens */}
+          <div className="absolute top-6 left-6 w-12 h-12 border-t border-l border-accent/20 pointer-events-none hidden sm:block" aria-hidden="true" />
+          <div className="absolute bottom-6 right-6 w-12 h-12 border-b border-r border-accent/20 pointer-events-none hidden sm:block" aria-hidden="true" />
+
+          {/* Close button — always visible top-right */}
+          <button
+            onClick={onClose}
+            aria-label="Close lightbox"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 flex items-center justify-center w-10 h-10 rounded-[2px] border border-white/10 text-white/50 hover:text-accent hover:border-accent/40 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+            </svg>
+          </button>
 
           <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 30 }}
+            initial={{ scale: 0.96, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 10 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="relative max-w-7xl w-full"
+            exit={{ scale: 0.96, opacity: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-5xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative group/lb overflow-hidden rounded-sm bg-graphite/5 ring-1 ring-white/10">
+            {/* Media */}
+            <div className="relative overflow-hidden rounded-[2px] bg-graphite/5 ring-1 ring-white/[0.08]">
               {type === "video" ? (
                 <video
                   src={src}
                   poster={poster}
                   controls
                   autoPlay
+                  playsInline
                   preload="auto"
-                  className="w-full max-h-[80vh] object-contain"
+                  className="w-full max-h-[70dvh] max-h-[70vh] object-contain"
                 />
               ) : (
-                <img 
-                  src={src} 
-                  alt={alt} 
-                  crossOrigin="anonymous" 
-                  className="w-full max-h-[80vh] object-contain shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]" 
+                <img
+                  src={src}
+                  alt={alt}
+                  crossOrigin="anonymous"
+                  className="w-full max-h-[70dvh] max-h-[70vh] object-contain"
                 />
               )}
             </div>
-            
-            <div className="mt-8 flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                 <div className="h-[1px] w-10 bg-accent/40" />
-                 <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-accent">Full Resolution Capture</p>
+
+            {/* Bottom bar */}
+            <div className="mt-4 sm:mt-6 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="h-[1px] w-8 bg-accent/40 hidden sm:block" aria-hidden="true" />
+                <p className="font-mono text-[8px] sm:text-[10px] uppercase tracking-[0.4em] text-accent/60">
+                  Full Resolution
+                </p>
               </div>
-              
               <button
                 onClick={onClose}
-                className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.4em] text-mist hover:text-accent transition-all group/close"
+                className="flex items-center gap-2.5 font-mono text-[8px] sm:text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-accent transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/50"
               >
-                <span className="opacity-0 group-hover/close:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">Dismiss</span>
-                <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover/close:border-accent transition-colors">
-                  <span className="text-sm">✕</span>
-                </div>
+                <span>Close</span>
+                <span className="font-mono text-[8px] text-white/20">ESC</span>
               </button>
             </div>
           </motion.div>

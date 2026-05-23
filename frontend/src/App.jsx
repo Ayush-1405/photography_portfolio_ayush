@@ -73,7 +73,7 @@ export default function App() {
     <>
       <GlobalScene />
       <div className="grain-overlay" />
-      <div className="min-h-screen transition-colors duration-700 opacity-100 relative z-10">
+      <div className="min-h-screen-d transition-colors duration-700 opacity-100 relative z-10">
         <Nav />
         <main>
           <Hero />
@@ -87,7 +87,7 @@ export default function App() {
           <Testimonials />
           <Contact />
         </main>
-        <footer className="border-t border-white/5 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-20 relative overflow-hidden">
+        <footer className="relative z-20 border-t border-white/5 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-20 overflow-hidden bg-[var(--void)]">
           <div className="mx-auto flex max-w-[var(--container-max)] flex-col gap-12 sm:flex-row sm:items-center sm:justify-between relative z-10">
             <div>
               <p className="font-display text-4xl sm:text-5xl text-bone tracking-tighter mb-4">

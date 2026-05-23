@@ -75,7 +75,7 @@ export function Hero() {
   }, [reduce]);
 
   return (
-    <header ref={heroRef} className="relative min-h-[90vh] overflow-hidden flex items-center pt-20 pb-10">
+    <header ref={heroRef} className="relative min-h-screen-d overflow-hidden flex items-center pt-24 pb-12 sm:pt-28 sm:pb-16">
       {/* Dynamic Gold Glow Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="hero-glow absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] rounded-full bg-accent/[0.04] blur-[150px] animate-liquid-drift" />
@@ -85,51 +85,53 @@ export function Hero() {
       <div className="relative z-10 w-full px-[var(--content-px-mobile)] lg:px-[var(--content-px)] max-w-[var(--container-max)] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
         {/* Left: Asymmetric Image Column */}
         <div className="lg:col-span-5 order-2 lg:order-1">
-          <div className="hero-image-box relative aspect-[3/4] w-full max-w-[380px] sm:max-w-[450px] mx-auto lg:max-w-none overflow-hidden rounded-sm bg-graphite shadow-2xl">
+          <div className="hero-image-box relative aspect-[3/4] w-full max-w-[300px] sm:max-w-[380px] lg:max-w-none mx-auto overflow-hidden rounded-sm bg-graphite shadow-2xl">
             <img
               src={heroImage}
               alt="Editorial Photography"
               className={`hero-image h-full w-full object-cover brightness-[0.8] hover:grayscale-0 transition-all duration-1000 ${isLightTheme ? 'grayscale-0' : 'grayscale'}`}
             />
-            {/* Overlay Gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-void/60 via-transparent to-transparent" />
           </div>
-          
-          {/* Metadata detail for mobile/desktop */}
-          <div className="mt-6 flex items-center justify-between lg:justify-start lg:gap-10 opacity-30 font-mono text-[9px] sm:text-xs-mono uppercase tracking-[0.3em]">
-            <div className="flex items-center gap-3">
+
+          <div className="mt-5 flex items-center justify-between lg:justify-start lg:gap-10 opacity-30 font-mono text-[9px] uppercase tracking-[0.3em]">
+            <div className="flex items-center gap-2">
               <span className="text-accent">FR.</span>
               <span>2026.05</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <span className="text-accent">LOC.</span>
               <span>MUMBAI</span>
             </div>
           </div>
         </div>
 
-        {/* Right: Massive Typography Column */}
+        {/* Right: Typography Column */}
         <div className="lg:col-span-7 order-1 lg:order-2">
           <div className="max-w-4xl">
-            <p className="hero-subtitle font-mono text-xs-mono uppercase text-accent mb-6 lg:mb-8 tracking-[0.5em] lg:tracking-[0.6em] opacity-80">Cinematographer & Director</p>
-            
-            <h1 className="font-display text-[clamp(2.5rem,12vw,9rem)] text-bone leading-[0.85] tracking-tighter mb-10 lg:mb-12">
+            <p className="hero-subtitle font-mono text-[9px] sm:text-xs-mono uppercase text-accent mb-5 lg:mb-8 tracking-[0.4em] lg:tracking-[0.6em] opacity-80">
+              Cinematographer & Director
+            </p>
+
+            <h1 className="font-display text-[clamp(3rem,11vw,9rem)] text-bone leading-[0.85] tracking-tighter mb-8 lg:mb-12">
               <div className="overflow-hidden">
                 <span className="hero-title-line block">Ayush</span>
               </div>
-              <div className="overflow-hidden lg:pl-24">
-                <span className="hero-title-line block italic text-accent">Mistry<span className="text-bone not-italic">.</span></span>
+              <div className="overflow-hidden pl-8 sm:pl-16 lg:pl-24">
+                <span className="hero-title-line block italic text-accent">
+                  Mistry<span className="text-bone not-italic">.</span>
+                </span>
               </div>
             </h1>
 
-            <div className="hero-subtitle flex flex-col sm:flex-row items-start sm:items-center gap-6 lg:gap-12">
-              <p className="font-sans text-base lg:text-lg text-mist max-w-sm leading-relaxed border-l border-accent/20 pl-6">
+            <div className="hero-subtitle flex flex-col sm:flex-row items-start sm:items-center gap-5 lg:gap-12">
+              <p className="font-sans text-sm sm:text-base lg:text-lg text-mist max-w-xs sm:max-w-sm leading-relaxed border-l border-accent/20 pl-5">
                 Crafting cinematic narratives through high-end editorial photography and film direction.
               </p>
-              
-              <a 
-                href="#work" 
-                className="group relative flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.3em] text-bone py-2"
+
+              <a
+                href="#work"
+                className="group relative flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.3em] text-bone py-2 shrink-0"
               >
                 <span>View Works</span>
                 <span className="h-[1px] w-8 bg-accent transition-all duration-500 group-hover:w-16" />
@@ -140,15 +142,15 @@ export function Hero() {
       </div>
 
       {/* Scroll Indicator */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
       >
-        <span className="font-mono text-[8px] uppercase tracking-[0.4em] text-accent/40 rotate-90 origin-left translate-x-1">Scroll</span>
-        <div className="h-12 w-[1px] bg-gradient-to-b from-accent/40 to-transparent relative overflow-hidden">
-          <motion.div 
+        <span className="font-mono text-[7px] uppercase tracking-[0.4em] text-accent/40">Scroll</span>
+        <div className="h-10 w-[1px] bg-gradient-to-b from-accent/40 to-transparent relative overflow-hidden">
+          <motion.div
             animate={{ y: ["-100%", "100%"] }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             className="absolute inset-0 bg-accent"

@@ -51,7 +51,7 @@ export function Intro() {
   }, [reduce]);
 
   return (
-    <section id="about" ref={containerRef} className="relative z-10 overflow-hidden px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)]">
+    <section id="about" ref={containerRef} className="relative z-10 overflow-hidden px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)] border-t border-white/5">
       <div className="mx-auto max-w-[var(--container-max)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
           
@@ -102,7 +102,7 @@ export function Intro() {
           </div>
 
           {/* Right: Portrait Image */}
-          <div className="lg:col-span-5 relative intro-reveal mt-12 lg:mt-0">
+          <div className="lg:col-span-5 relative intro-reveal mt-12 lg:mt-0 lg:pl-10">
             <div className="aspect-[4/5] w-full max-w-[350px] sm:max-w-[450px] mx-auto lg:max-w-none overflow-hidden rounded-sm bg-graphite shadow-2xl relative intro-portrait">
               <motion.div
                 initial={{ clipPath: "inset(0% 0% 100% 0%)" }}
@@ -119,13 +119,8 @@ export function Intro() {
                   className="h-full w-full object-cover"
                 />
               </motion.div>
-              <div className="absolute top-8 right-[-5%] sm:right-[-10%] lg:right-[-20%]">
-                {/* <p className="font-mono text-[8px] sm:text-[10px] lg:text-xs-mono uppercase tracking-[0.8em] text-bone/20 rotate-90 origin-right whitespace-nowrap">
-                  Visual Artist
-                </p> */}
-              </div>
             </div>
-            <div className="absolute -left-4 sm:-left-6 lg:-left-8 -bottom-4 sm:-bottom-6 lg:-bottom-8 w-24 sm:w-32 lg:w-40 h-24 sm:h-32 lg:h-40 border border-accent/10 -z-10" />
+            <div className="absolute -left-2 sm:-left-4 lg:left-2 -bottom-4 sm:-bottom-6 lg:-bottom-8 w-24 sm:w-32 lg:w-40 h-24 sm:h-32 lg:h-40 border border-accent/10 -z-10" />
           </div>
         </div>
       </div>

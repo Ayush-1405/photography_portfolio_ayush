@@ -13,6 +13,7 @@ export const projects = [
     description: "Dawn light across ridgelines — a study in negative space and atmosphere. This series captures the silent conversation between the earth and the first light of day, highlighting the minimalist beauty of untouched terrains and the ephemeral quality of mountain mists.",
     src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80",
     type: "image",
+    drive_link: null,
   },
   {
     id: "p2",
@@ -22,6 +23,7 @@ export const projects = [
     description: "Night geometry and reflections in the city core. This project examines the architectural symmetry of modern urban environments under the cloak of night, where artificial light creates a new, cinematic reality through glass, steel, and shadow.",
     src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1600&q=80",
     type: "image",
+    drive_link: null,
   },
   {
     id: "p3",
@@ -31,6 +33,7 @@ export const projects = [
     description: "Long exposures where tide and sky merge into one tone. A visual exploration of the horizon line and the meditative quality of the ocean, using extended shutter speeds to transform chaotic waves into ethereal, painterly textures.",
     src: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?auto=format&fit=crop&w=1600&q=80",
     type: "image",
+    drive_link: null,
   },
 ];
 

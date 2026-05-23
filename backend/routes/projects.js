@@ -58,7 +58,7 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      const { title, category, year, description, src, sort_order } = req.body;
+      const { title, category, year, description, src, sort_order, drive_link } = req.body;
       let calculatedType = req.body.type;
 
       if (!title || !category || !year) {
@@ -102,6 +102,7 @@ router.post(
         public_id: mediaPublicId,
         poster: posterSrc,
         poster_public_id: posterPublicId,
+        drive_link: drive_link || null,
         sort_order: parseInt(sort_order) || 0,
       });
 
@@ -125,7 +126,7 @@ router.put(
       const existing = await Project.findById(req.params.id);
       if (!existing) return res.status(404).json({ error: "Not found" });
 
-      const { title, category, year, description, src, type, sort_order } = req.body;
+      const { title, category, year, description, src, type, sort_order, drive_link } = req.body;
 
       if (req.files?.media?.[0]) {
         if (existing.public_id) {
@@ -155,6 +156,7 @@ router.put(
       if (description !== undefined) existing.description = description;
       if (type !== undefined && (type === "image" || type === "video")) existing.type = type;
       if (sort_order !== undefined) existing.sort_order = parseInt(sort_order);
+      if (drive_link !== undefined) existing.drive_link = drive_link || null;
 
       await existing.save();
       res.json(existing);

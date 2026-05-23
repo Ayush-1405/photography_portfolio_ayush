@@ -1,125 +1,165 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { testimonials } from "../data";
-import { ScrollReveal } from "./ScrollReveal";
+import { useReducedMotion } from "framer-motion";
+
+const EASE = [0.16, 1, 0.3, 1];
+
+function useIsTouch() {
+  const [touch, setTouch] = useState(false);
+  useEffect(() => { setTouch(window.matchMedia("(pointer: coarse)").matches); }, []);
+  return touch;
+}
 
 export function Testimonials() {
-  const scrollContainerRef = useRef(null);
-  const horizontalRef = useRef(null);
+  const reduce              = useReducedMotion();
+  const isTouch             = useIsTouch();
+  const scrollContainerRef  = useRef(null);
+  const horizontalRef       = useRef(null);
 
+  /* ── GSAP horizontal scroll — desktop only ─────────────────────────────── */
   useEffect(() => {
+    if (reduce || isTouch) return;
+
     const ctx = gsap.context(() => {
-      const horizontalSection = horizontalRef.current;
-      if (!horizontalSection) return;
+      const track = horizontalRef.current;
+      if (!track) return;
 
-      // Function to calculate dimensions accurately
-      const getScrollAmount = () => {
-        const totalWidth = horizontalSection.scrollWidth;
-        const windowWidth = window.innerWidth;
-        return totalWidth - windowWidth;
-      };
+      const getScrollAmount = () => track.scrollWidth - window.innerWidth;
 
-      let amountToScroll = getScrollAmount();
-
-      // Primary Horizontal Scroll Pinning
-      const pinTrigger = gsap.to(horizontalSection, {
+      const pinTrigger = gsap.to(track, {
         x: () => -getScrollAmount(),
         ease: "none",
         scrollTrigger: {
           trigger: scrollContainerRef.current,
           pin: true,
+          pinSpacing: true,
           start: "top top",
           end: () => `+=${getScrollAmount()}`,
-          scrub: 1, // Reduced for better performance
+          scrub: 1,
           invalidateOnRefresh: true,
           anticipatePin: 1,
           fastScrollEnd: true,
-        }
+        },
       });
 
-      // Header Text Entrance
       gsap.from(".testimonial-header-text", {
-        scale: 0.9,
-        y: 30,
-        opacity: 0,
-        duration: 1.8,
-        stagger: 0.1,
-        ease: "power4.out",
-        scrollTrigger: {
-          trigger: scrollContainerRef.current,
-          start: "top 70%",
-          once: true,
-        }
+        scale: 0.95, y: 24, opacity: 0, duration: 1.4, stagger: 0.08, ease: "power4.out",
+        scrollTrigger: { trigger: scrollContainerRef.current, start: "top 72%", once: true },
       });
 
-      // Card Staggered Entrance - Optimized for horizontal context
-      gsap.set(".testimonial-card", { scale: 0.9, opacity: 0 });
+      gsap.set(".testimonial-card", { scale: 0.92, opacity: 0 });
       gsap.to(".testimonial-card", {
-        scale: 1,
-        opacity: 1,
-        duration: 1.2,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: horizontalSection,
-          start: "left 95%",
-          containerAnimation: pinTrigger,
-        }
+        scale: 1, opacity: 1, duration: 1.1, stagger: 0.08, ease: "power3.out",
+        scrollTrigger: { trigger: track, start: "left 95%", containerAnimation: pinTrigger },
       });
 
-      // Force refresh on window resize to ensure calculations are perfect
-      window.addEventListener("resize", () => {
-        ScrollTrigger.refresh();
-      });
+      // Cleaned-up resize handler
+      const onResize = () => ScrollTrigger.refresh();
+      window.addEventListener("resize", onResize);
+      return () => window.removeEventListener("resize", onResize);
     }, scrollContainerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [reduce, isTouch]);
 
+  /* ── Mobile / reduced-motion: vertical grid ────────────────────────────── */
+  if (reduce || isTouch) {
+    return (
+      <section
+        id="testimonials"
+        className="relative z-20 border-t border-white/5 bg-[var(--void)] py-[var(--section-py)]"
+        aria-label="Client testimonials"
+      >
+        <div className="px-5 sm:px-8 lg:px-20">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.9, ease: EASE }}
+            className="mb-10 sm:mb-14"
+          >
+            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-accent mb-3">Testimonials</p>
+            <h2 className="font-display text-4xl sm:text-6xl text-bone tracking-[-0.03em] leading-none">
+              Client <span className="italic text-accent">Perspectives</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.8, ease: EASE, delay: i * 0.07 }}
+                className="flex flex-col justify-between p-6 sm:p-8 bg-graphite/10 border border-white/[0.06] rounded-[2px]"
+              >
+                <div className="relative mb-6">
+                  <span className="font-display text-4xl text-accent/20 absolute -top-3 -left-1 select-none">"</span>
+                  <p className="font-sans text-sm sm:text-base text-bone/85 leading-relaxed relative z-10 pt-2">
+                    {t.quote}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4 border-t border-white/[0.05] pt-5">
+                  <div className="h-[1px] w-6 bg-accent/30 shrink-0" />
+                  <div>
+                    <p className="font-display text-lg text-bone">{t.author}</p>
+                    <p className="font-mono text-[8px] uppercase tracking-widest text-mist/40 mt-0.5">{t.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ── Desktop: horizontal scroll ────────────────────────────────────────── */
   return (
-    <section id="testimonials" ref={scrollContainerRef} className="relative z-10 overflow-hidden border-t border-white/5">
-      <div className="sticky top-0 h-screen flex flex-col justify-center px-[var(--content-px-mobile)] lg:px-[var(--content-px)] max-w-[var(--container-max)] mx-auto">
-        
-        {/* Header Content */}
-        <div className="mb-12 sm:mb-16">
-          <p className="testimonial-header-text font-mono text-xs-mono uppercase text-accent mb-3 tracking-[0.4em]">Testimonials</p>
-          <h2 className="testimonial-header-text font-display text-5xl sm:text-7xl lg:text-8xl text-bone tracking-tighter leading-[0.9]">
+    <section
+      id="testimonials"
+      ref={scrollContainerRef}
+      className="relative z-20 overflow-hidden border-t border-white/5 bg-[var(--void)]"
+      aria-label="Client testimonials"
+    >
+      <div className="sticky top-0 h-screen-d flex flex-col justify-center px-[var(--content-px-mobile)] lg:px-[var(--content-px)]">
+        <div className="mb-10 sm:mb-14">
+          <p className="testimonial-header-text font-mono text-[9px] uppercase tracking-[0.5em] text-accent mb-3">Testimonials</p>
+          <h2 className="testimonial-header-text font-display text-5xl sm:text-7xl lg:text-8xl text-bone tracking-[-0.03em] leading-[0.9]">
             Client <span className="italic text-accent">Perspectives</span>
           </h2>
         </div>
 
-        {/* Horizontal Container */}
-        <div 
-          ref={horizontalRef} 
-          className="flex gap-10 sm:gap-16 lg:gap-24 items-center will-change-transform"
+        <div
+          ref={horizontalRef}
+          className="flex gap-8 sm:gap-12 lg:gap-20 items-stretch will-change-transform"
           style={{ width: "fit-content" }}
         >
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className="testimonial-card relative shrink-0 w-[80vw] sm:w-[50vw] lg:w-[35vw] aspect-video sm:aspect-square lg:aspect-video flex flex-col justify-between p-8 lg:p-12 bg-graphite/20 backdrop-blur-sm border border-white/5 rounded-sm group hover:border-accent/30 transition-all duration-700"
+              className="testimonial-card relative shrink-0 w-[82vw] sm:w-[52vw] lg:w-[36vw] flex flex-col justify-between p-7 sm:p-10 lg:p-12 bg-graphite/10 backdrop-blur-sm border border-white/[0.06] rounded-[2px] group hover:border-accent/25 transition-[border-color] duration-700"
             >
               <div className="relative">
-                <span className="font-display text-5xl lg:text-6xl text-accent/20 absolute -top-4 -left-2 select-none group-hover:text-accent/40 transition-colors duration-700">“</span>
-                <p className="font-sans text-base lg:text-lg text-bone/90 leading-relaxed relative z-10 line-clamp-6">
+                <span className="font-display text-5xl lg:text-6xl text-accent/15 absolute -top-4 -left-2 select-none group-hover:text-accent/30 transition-colors duration-700">"</span>
+                <p className="font-sans text-sm sm:text-base lg:text-lg text-bone/85 leading-relaxed relative z-10 line-clamp-5 sm:line-clamp-6">
                   {t.quote}
                 </p>
               </div>
-
-              <div className="flex items-center gap-6 mt-10">
-                <div className="h-[1px] w-8 bg-accent/30" />
+              <div className="flex items-center gap-5 mt-8 border-t border-white/[0.05] pt-6">
+                <div className="h-[1px] w-7 bg-accent/30 shrink-0" />
                 <div>
-                  <p className="font-display text-xl lg:text-2xl text-bone mb-1 group-hover:text-accent transition-colors duration-500">{t.author}</p>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-mist/40">{t.role}</p>
+                  <p className="font-display text-xl lg:text-2xl text-bone group-hover:text-accent transition-colors duration-500">{t.author}</p>
+                  <p className="font-mono text-[8px] uppercase tracking-widest text-mist/40 mt-0.5">{t.role}</p>
                 </div>
               </div>
             </div>
           ))}
-
-          {/* Spacer to end the scroll properly */}
-          <div className="w-[10vw] shrink-0" />
+          <div className="w-[8vw] shrink-0" aria-hidden="true" />
         </div>
       </div>
     </section>

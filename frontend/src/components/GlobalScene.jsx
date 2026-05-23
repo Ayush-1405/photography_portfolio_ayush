@@ -242,13 +242,23 @@ export function GlobalScene() {
   const { theme } = useTheme();
   const isLightTheme = theme === "bone";
 
+  // Disable heavy 3D scene on touch/mobile devices for performance
+  const [enabled, setEnabled] = useState(true);
+  useEffect(() => {
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    const isSmall = window.innerWidth < 768;
+    if (isTouch || isSmall) setEnabled(false);
+  }, []);
+
+  if (!enabled) return null;
+
   return (
-    <div 
+    <div
       className={`fixed inset-0 z-0 pointer-events-none transition-all duration-1000 overflow-hidden ${
         isLightTheme ? 'opacity-40 bg-void' : 'opacity-60 bg-void'
       }`}
     >
-      <Canvas dpr={[1, 2]} gl={{ antialias: false, stencil: false, depth: true }}>
+      <Canvas dpr={[1, 1.5]} gl={{ antialias: false, stencil: false, depth: true }}>
         <SceneContents />
       </Canvas>
     </div>
