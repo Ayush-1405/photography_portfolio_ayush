@@ -72,6 +72,8 @@ export default function App() {
   return (
     <>
       <GlobalScene />
+      {/* CSS atmospheric glow — always visible, supplements 3D scene */}
+      <div className="bg-atmosphere" aria-hidden="true" />
       <div className="grain-overlay" />
       <div className="min-h-screen-d transition-colors duration-700 opacity-100 relative z-10">
         <Nav />

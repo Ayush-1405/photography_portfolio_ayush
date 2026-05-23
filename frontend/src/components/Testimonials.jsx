@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { testimonials } from "../data";
-import { useReducedMotion } from "framer-motion";
 
 const EASE = [0.16, 1, 0.3, 1];
 
@@ -13,13 +12,46 @@ function useIsTouch() {
   return touch;
 }
 
-export function Testimonials() {
-  const reduce              = useReducedMotion();
-  const isTouch             = useIsTouch();
-  const scrollContainerRef  = useRef(null);
-  const horizontalRef       = useRef(null);
+/* ─── TestimonialCard — shared ────────────────────────────────────────────── */
+function TestimonialCard({ t, index, isMobile }) {
+  return (
+    <div
+      className={`
+        testimonial-card relative shrink-0 flex flex-col justify-between
+        bg-graphite/10 backdrop-blur-sm border border-white/[0.06] rounded-[2px]
+        group hover:border-accent/25 transition-[border-color] duration-700
+        ${isMobile
+          ? "w-[78vw] sm:w-[55vw] p-6 sm:p-8"
+          : "w-[82vw] sm:w-[52vw] lg:w-[36vw] p-7 sm:p-10 lg:p-12"
+        }
+      `}
+    >
+      <div className="relative mb-6">
+        <span className="font-display text-5xl text-accent/15 absolute -top-4 -left-2 select-none group-hover:text-accent/30 transition-colors duration-700">"</span>
+        <p className={`font-sans text-bone/85 leading-relaxed relative z-10 ${isMobile ? "text-sm line-clamp-5" : "text-sm sm:text-base lg:text-lg line-clamp-5 sm:line-clamp-6"}`}>
+          {t.quote}
+        </p>
+      </div>
+      <div className="flex items-center gap-4 border-t border-white/[0.05] pt-5">
+        <div className="h-[1px] w-6 bg-accent/30 shrink-0" />
+        <div>
+          <p className={`font-display text-bone group-hover:text-accent transition-colors duration-500 ${isMobile ? "text-lg" : "text-xl lg:text-2xl"}`}>
+            {t.author}
+          </p>
+          <p className="font-mono text-[8px] uppercase tracking-widest text-mist/40 mt-0.5">{t.role}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  /* ── GSAP horizontal scroll — desktop only ─────────────────────────────── */
+export function Testimonials() {
+  const reduce             = useReducedMotion();
+  const isTouch            = useIsTouch();
+  const scrollContainerRef = useRef(null);
+  const horizontalRef      = useRef(null);
+
+  /* ── GSAP pin — desktop only ────────────────────────────────────────────── */
   useEffect(() => {
     if (reduce || isTouch) return;
 
@@ -56,7 +88,6 @@ export function Testimonials() {
         scrollTrigger: { trigger: track, start: "left 95%", containerAnimation: pinTrigger },
       });
 
-      // Cleaned-up resize handler
       const onResize = () => ScrollTrigger.refresh();
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
@@ -65,65 +96,54 @@ export function Testimonials() {
     return () => ctx.revert();
   }, [reduce, isTouch]);
 
-  /* ── Mobile / reduced-motion: vertical grid ────────────────────────────── */
-  if (reduce || isTouch) {
+  /* ── MOBILE — native swipe, same cards ─────────────────────────────────── */
+  if (isTouch || reduce) {
     return (
       <section
         id="testimonials"
-        className="relative z-20 border-t border-white/5 bg-[var(--void)] py-[var(--section-py)]"
+        className="relative z-20 border-t border-white/[0.05] bg-[var(--void)] py-14 sm:py-20"
         aria-label="Client testimonials"
       >
-        <div className="px-5 sm:px-8 lg:px-20">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.9, ease: EASE }}
-            className="mb-10 sm:mb-14"
-          >
-            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-accent mb-3">Testimonials</p>
-            <h2 className="font-display text-4xl sm:text-6xl text-bone tracking-[-0.03em] leading-none">
-              Client <span className="italic text-accent">Perspectives</span>
-            </h2>
-          </motion.div>
+        {/* header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.85, ease: EASE }}
+          className="px-5 sm:px-8 mb-7"
+        >
+          <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-accent mb-2.5">Testimonials</p>
+          <h2 className="font-display text-4xl sm:text-5xl text-bone tracking-[-0.03em] leading-none">
+            Client <span className="italic text-accent">Perspectives</span>
+          </h2>
+        </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 32 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.8, ease: EASE, delay: i * 0.07 }}
-                className="flex flex-col justify-between p-6 sm:p-8 bg-graphite/10 border border-white/[0.06] rounded-[2px]"
-              >
-                <div className="relative mb-6">
-                  <span className="font-display text-4xl text-accent/20 absolute -top-3 -left-1 select-none">"</span>
-                  <p className="font-sans text-sm sm:text-base text-bone/85 leading-relaxed relative z-10 pt-2">
-                    {t.quote}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 border-t border-white/[0.05] pt-5">
-                  <div className="h-[1px] w-6 bg-accent/30 shrink-0" />
-                  <div>
-                    <p className="font-display text-lg text-bone">{t.author}</p>
-                    <p className="font-mono text-[8px] uppercase tracking-widest text-mist/40 mt-0.5">{t.role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        {/* native swipe — same cards as desktop */}
+        <div
+          className="h-scroll-fallback flex gap-4 sm:gap-5 px-5 sm:px-8 pb-2 items-stretch"
+          role="list"
+          aria-label="Testimonial cards"
+        >
+          {testimonials.map((t, i) => (
+            <TestimonialCard key={i} t={t} index={i} isMobile={true} />
+          ))}
+          <div className="shrink-0 w-4" aria-hidden="true" />
+        </div>
+
+        <div className="flex items-center gap-2 px-5 sm:px-8 mt-4">
+          <span className="font-mono text-[7px] uppercase tracking-[0.4em] text-mist/25">Swipe to read</span>
+          <span className="h-[1px] w-8 bg-mist/15" aria-hidden="true" />
         </div>
       </section>
     );
   }
 
-  /* ── Desktop: horizontal scroll ────────────────────────────────────────── */
+  /* ── DESKTOP — GSAP pinned ──────────────────────────────────────────────── */
   return (
     <section
       id="testimonials"
       ref={scrollContainerRef}
-      className="relative z-20 overflow-hidden border-t border-white/5 bg-[var(--void)]"
+      className="relative z-20 overflow-hidden border-t border-white/[0.05] bg-[var(--void)]"
       aria-label="Client testimonials"
     >
       <div className="sticky top-0 h-screen-d flex flex-col justify-center px-[var(--content-px-mobile)] lg:px-[var(--content-px)]">
@@ -140,24 +160,7 @@ export function Testimonials() {
           style={{ width: "fit-content" }}
         >
           {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className="testimonial-card relative shrink-0 w-[82vw] sm:w-[52vw] lg:w-[36vw] flex flex-col justify-between p-7 sm:p-10 lg:p-12 bg-graphite/10 backdrop-blur-sm border border-white/[0.06] rounded-[2px] group hover:border-accent/25 transition-[border-color] duration-700"
-            >
-              <div className="relative">
-                <span className="font-display text-5xl lg:text-6xl text-accent/15 absolute -top-4 -left-2 select-none group-hover:text-accent/30 transition-colors duration-700">"</span>
-                <p className="font-sans text-sm sm:text-base lg:text-lg text-bone/85 leading-relaxed relative z-10 line-clamp-5 sm:line-clamp-6">
-                  {t.quote}
-                </p>
-              </div>
-              <div className="flex items-center gap-5 mt-8 border-t border-white/[0.05] pt-6">
-                <div className="h-[1px] w-7 bg-accent/30 shrink-0" />
-                <div>
-                  <p className="font-display text-xl lg:text-2xl text-bone group-hover:text-accent transition-colors duration-500">{t.author}</p>
-                  <p className="font-mono text-[8px] uppercase tracking-widest text-mist/40 mt-0.5">{t.role}</p>
-                </div>
-              </div>
-            </div>
+            <TestimonialCard key={i} t={t} index={i} isMobile={false} />
           ))}
           <div className="w-[8vw] shrink-0" aria-hidden="true" />
         </div>
