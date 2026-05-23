@@ -212,7 +212,7 @@ function SceneContents() {
         {frameData.map((data, i) => (
           <FloatingFrame key={i} {...data} scrollRef={scrollRef} />
         ))}
-        <DustParticles count={isLightTheme ? 150 : 300} />
+        <DustParticles count={isLightTheme ? 80 : 150} />
       </Suspense>
 
       <Environment preset="studio" />
@@ -241,13 +241,14 @@ function SceneContents() {
 export function GlobalScene() {
   const { theme } = useTheme();
   const isLightTheme = theme === "bone";
-
-  // Disable heavy 3D scene on touch/mobile devices for performance
   const [enabled, setEnabled] = useState(true);
+
   useEffect(() => {
+    // Only disable on very low-end: small screen AND touch AND low memory
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
-    const isSmall = window.innerWidth < 768;
-    if (isTouch || isSmall) setEnabled(false);
+    const isSmall = window.innerWidth < 480;
+    const lowMem  = navigator.deviceMemory !== undefined && navigator.deviceMemory < 2;
+    if (isSmall && isTouch && lowMem) setEnabled(false);
   }, []);
 
   if (!enabled) return null;
@@ -255,7 +256,7 @@ export function GlobalScene() {
   return (
     <div
       className={`fixed inset-0 z-0 pointer-events-none transition-all duration-1000 overflow-hidden ${
-        isLightTheme ? 'opacity-40 bg-void' : 'opacity-60 bg-void'
+        isLightTheme ? 'opacity-30 sm:opacity-40' : 'opacity-40 sm:opacity-60'
       }`}
     >
       <Canvas dpr={[1, 1.5]} gl={{ antialias: false, stencil: false, depth: true }}>
