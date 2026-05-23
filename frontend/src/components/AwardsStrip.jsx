@@ -4,7 +4,7 @@ export function AwardsStrip() {
   const repeated = [...awards, ...awards, ...awards, ...awards];
 
   return (
-    <div className="overflow-hidden border-y border-white/5 bg-void py-6 sm:py-8">
+    <div className="overflow-hidden border-y border-white/5 py-6 sm:py-8">
       <div
         className="flex gap-16 sm:gap-24 whitespace-nowrap animate-marquee"
         style={{ width: "max-content" }}

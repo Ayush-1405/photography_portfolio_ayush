@@ -4,30 +4,34 @@
 
 @layer base {
   :root {
-    --void: #0a0a0a;
-    --bone: #f5f5f7;
-    --accent: #d4af37;
-    --mist: rgba(245, 245, 247, 0.6);
-    --graphite: #1a1a1a;
-    --ink: #111111;
+    --void: #f5f5f7; /* Primary Light Background (Bone White) */
+    --bone: #0a0a0a; /* Primary Dark Text (Void Black) */
+    --accent: #d4af37; /* Champagne Gold */
+    --mist: rgba(10, 10, 10, 0.5); /* Muted Text */
+    --graphite: #e5e5e7; /* Subtle Contrast Surface */
+    --ink: #ffffff; /* Absolute White */
+    --container-max: 1800px;
+    --section-py: 8rem; /* 128px */
+    --content-px: 5rem; /* 80px */
+    --content-px-mobile: 1.5rem; /* 24px */
   }
 
   [data-theme="void"] {
     --void: #0a0a0a;
     --bone: #f5f5f7;
     --accent: #d4af37;
-    --mist: rgba(245, 245, 247, 0.6);
+    --mist: rgba(245, 245, 247, 0.5);
     --graphite: #1a1a1a;
     --ink: #111111;
   }
 
-  [data-theme="bone"] {
-    --void: #f5f5f7;
-    --bone: #0a0a0a;
-    --mist: rgba(10, 10, 10, 0.6);
-    --graphite: #e5e5e7;
-    --ink: #eeeeef;
-    --accent: #b8860b; /* Slightly deeper gold for light mode visibility */
+  [data-theme="clay"] {
+    --void: #2c2c2a;
+    --bone: #e5e1d8;
+    --accent: #d4af37;
+    --mist: rgba(229, 225, 216, 0.5);
+    --graphite: #3d3d3b;
+    --ink: #1a1a19;
   }
 
   [data-theme="clay"] {

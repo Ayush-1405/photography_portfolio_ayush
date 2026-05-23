@@ -51,8 +51,8 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" ref={sectionRef} className="relative z-10 bg-void px-6 py-20 lg:py-32 overflow-hidden border-t border-white/5">
-      <div className="mx-auto max-w-[1800px] px-6 sm:px-10 lg:px-20">
+    <section id="contact" ref={sectionRef} className="relative z-10 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)] overflow-hidden border-t border-white/5">
+      <div className="mx-auto max-w-[var(--container-max)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
           
           {/* Left Column: Typography */}

@@ -51,8 +51,8 @@ export function Intro() {
   }, [reduce]);
 
   return (
-    <section id="about" ref={containerRef} className="relative z-10 overflow-hidden bg-void px-6 py-20 lg:py-32">
-      <div className="mx-auto max-w-[1800px] px-6 sm:px-10 lg:px-20">
+    <section id="about" ref={containerRef} className="relative z-10 overflow-hidden px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)]">
+      <div className="mx-auto max-w-[var(--container-max)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
           
           {/* Left: Text Content */}

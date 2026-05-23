@@ -21,7 +21,7 @@ export function HorizontalStrip() {
       const windowWidth = window.innerWidth;
       const amountToScroll = totalWidth - windowWidth;
 
-      gsap.to(horizontalSection, {
+      const pinTrigger = gsap.to(horizontalSection, {
         x: -amountToScroll,
         ease: "none",
         scrollTrigger: {
@@ -32,11 +32,12 @@ export function HorizontalStrip() {
           scrub: 1, // Reduced scrub for more immediate response
           invalidateOnRefresh: true,
           anticipatePin: 1,
+          fastScrollEnd: true,
         }
       });
 
       // Child reveals tied to the horizontal scroll
-      gsap.from(".strip-card", {
+      gsap.from(".strip-header-text", {
         scale: 0.9,
         opacity: 0,
         y: 30,
@@ -48,22 +49,36 @@ export function HorizontalStrip() {
           start: "top 70%",
         }
       });
+
+      // Card reveals tied to container animation
+      gsap.from(".strip-card", {
+        x: 100,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 1.2,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: horizontalSection,
+          start: "left 95%",
+          containerAnimation: pinTrigger,
+        }
+      });
     }, scrollContainerRef);
 
     return () => ctx.revert();
   }, [reduce]);
 
   return (
-    <section id="frames" ref={scrollContainerRef} className="relative z-10 bg-void overflow-hidden border-t border-white/5">
-      <div className="px-6 sm:px-10 lg:px-20 mb-12 sm:mb-16 w-full max-w-[1800px] mx-auto">
-        <p className="strip-header-text font-mono text-xs-mono sm:text-sm-mono uppercase text-accent mb-4 tracking-[0.4em]">Continuous Reel</p>
-        <h2 className="strip-header-text font-display text-4xl sm:text-5xl lg:text-7xl text-bone tracking-tighter leading-none">Selected <span className="italic text-accent">Frames</span></h2>
-      </div>
+    <section id="frames" ref={scrollContainerRef} className="relative z-10 overflow-hidden border-t border-white/5">
+      <div className="sticky top-0 h-screen flex flex-col justify-center">
+        <div className="px-[var(--content-px-mobile)] lg:px-[var(--content-px)] mb-12 sm:mb-16 w-full max-w-[var(--container-max)] mx-auto">
+           <p className="strip-header-text font-mono text-xs-mono uppercase text-accent mb-4 tracking-[0.4em]">Continuous Reel</p>
+           <h2 className="strip-header-text font-display text-4xl sm:text-5xl lg:text-7xl text-bone tracking-tighter leading-none">Selected <span className="italic text-accent">Frames</span></h2>
+        </div>
 
-      <div className="relative flex items-center">
         <div 
           ref={horizontalRef} 
-          className="flex gap-10 sm:gap-16 lg:gap-24 px-6 sm:px-10 lg:px-20 will-change-transform"
+          className="flex gap-10 sm:gap-16 lg:gap-24 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] will-change-transform"
           style={{ width: "fit-content" }}
         >
           {stripImages.map((item, i) => (

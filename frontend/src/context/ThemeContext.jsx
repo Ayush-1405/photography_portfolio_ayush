@@ -4,7 +4,7 @@ const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("portfolio-theme") || "void";
+    return localStorage.getItem("portfolio-theme") || "bone"; // Set 'bone' (White) as primary theme
   });
 
   useEffect(() => {

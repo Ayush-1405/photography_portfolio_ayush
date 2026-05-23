@@ -15,6 +15,7 @@ import { Testimonials } from "./components/Testimonials";
 import { Contact } from "./components/Contact";
 import { Loader } from "./components/Loader";
 import { Gallery } from "./components/Gallery";
+import { GlobalScene } from "./components/GlobalScene";
 
 export default function App() {
   const [loaded, setLoaded] = useState(true);
@@ -70,8 +71,9 @@ export default function App() {
 
   return (
     <>
+      <GlobalScene />
       <div className="grain-overlay" />
-      <div className="min-h-screen bg-void transition-colors duration-700 opacity-100">
+      <div className="min-h-screen transition-colors duration-700 opacity-100 relative z-10">
         <Nav />
         <main>
           <Hero />
@@ -85,8 +87,8 @@ export default function App() {
           <Testimonials />
           <Contact />
         </main>
-        <footer className="border-t border-white/5 px-6 py-20 sm:px-10 lg:px-20 bg-void relative overflow-hidden">
-          <div className="mx-auto flex max-w-[1800px] flex-col gap-12 sm:flex-row sm:items-center sm:justify-between relative z-10">
+        <footer className="border-t border-white/5 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-20 relative overflow-hidden">
+          <div className="mx-auto flex max-w-[var(--container-max)] flex-col gap-12 sm:flex-row sm:items-center sm:justify-between relative z-10">
             <div>
               <p className="font-display text-4xl sm:text-5xl text-bone tracking-tighter mb-4">
                 Ayush<span className="text-accent italic">.</span>Mistry

@@ -39,17 +39,17 @@ export function Testimonials() {
         }
       });
 
-      // Header Text Parallax
-      gsap.set(".testimonial-header-text", { y: 120, opacity: 0 });
-      gsap.to(".testimonial-header-text", {
-        y: 0,
-        opacity: 1,
+      // Header Text Entrance
+      gsap.from(".testimonial-header-text", {
+        scale: 0.9,
+        y: 30,
+        opacity: 0,
         duration: 1.8,
         stagger: 0.1,
         ease: "power4.out",
         scrollTrigger: {
           trigger: scrollContainerRef.current,
-          start: "top 80%",
+          start: "top 70%",
           once: true,
         }
       });
@@ -79,8 +79,8 @@ export function Testimonials() {
   }, []);
 
   return (
-    <section id="testimonials" ref={scrollContainerRef} className="relative z-10 bg-void overflow-hidden border-t border-white/5">
-      <div className="sticky top-0 h-screen flex flex-col justify-center px-6 sm:px-10 lg:px-20">
+    <section id="testimonials" ref={scrollContainerRef} className="relative z-10 overflow-hidden border-t border-white/5">
+      <div className="sticky top-0 h-screen flex flex-col justify-center px-[var(--content-px-mobile)] lg:px-[var(--content-px)] max-w-[var(--container-max)] mx-auto">
         
         {/* Header Content */}
         <div className="mb-12 sm:mb-16">

@@ -105,8 +105,8 @@ export function Gallery() {
   const getSpan = (item) => item.span || "tall";
 
   return (
-    <section id="gallery" ref={galleryRef} className="relative z-10 px-6 py-20 lg:py-32 bg-void border-t border-white/5 overflow-hidden">
-      <div className="mx-auto max-w-[1800px] px-6 sm:px-10 lg:px-20">
+    <section id="gallery" ref={galleryRef} className="relative z-10 px-[var(--content-px-mobile)] lg:px-[var(--content-px)] py-[var(--section-py)] border-t border-white/5 overflow-hidden">
+      <div className="mx-auto max-w-[var(--container-max)]">
         
         {/* Header & Filters */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-12 sm:mb-16">

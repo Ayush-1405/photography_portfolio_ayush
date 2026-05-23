@@ -75,14 +75,14 @@ export function Hero() {
   }, [reduce]);
 
   return (
-    <header ref={heroRef} className="relative min-h-screen overflow-hidden bg-void flex items-center pt-20 pb-10">
+    <header ref={heroRef} className="relative min-h-[90vh] overflow-hidden flex items-center pt-20 pb-10">
       {/* Dynamic Gold Glow Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="hero-glow absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] rounded-full bg-accent/[0.04] blur-[150px] animate-liquid-drift" />
         <div className="hero-glow absolute bottom-[-20%] left-[-10%] w-[70vw] h-[70vw] rounded-full bg-accent/[0.03] blur-[180px] animate-liquid-drift" style={{ animationDelay: "-5s" }} />
       </div>
 
-      <div className="relative z-10 w-full px-6 sm:px-10 lg:px-20 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+      <div className="relative z-10 w-full px-[var(--content-px-mobile)] lg:px-[var(--content-px)] max-w-[var(--container-max)] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
         {/* Left: Asymmetric Image Column */}
         <div className="lg:col-span-5 order-2 lg:order-1">
           <div className="hero-image-box relative aspect-[3/4] w-full max-w-[380px] sm:max-w-[450px] mx-auto lg:max-w-none overflow-hidden rounded-sm bg-graphite shadow-2xl">
@@ -123,12 +123,12 @@ export function Hero() {
             </h1>
 
             <div className="hero-subtitle flex flex-col sm:flex-row items-start sm:items-center gap-6 lg:gap-12">
-              <p className="font-sans text-base lg:text-lg text-mist max-w-sm leading-relaxed border-l border-white/5 pl-6">
+              <p className="font-sans text-base lg:text-lg text-mist max-w-sm leading-relaxed border-l border-accent/20 pl-6">
                 Crafting cinematic narratives through high-end editorial photography and film direction.
               </p>
               
               <a 
-                href="#work"
+                href="#work" 
                 className="group relative flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.3em] text-bone py-2"
               >
                 <span>View Works</span>
@@ -138,6 +138,23 @@ export function Hero() {
           </div>
         </div>
       </div>
+
+      {/* Scroll Indicator */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2, duration: 1 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
+      >
+        <span className="font-mono text-[8px] uppercase tracking-[0.4em] text-accent/40 rotate-90 origin-left translate-x-1">Scroll</span>
+        <div className="h-12 w-[1px] bg-gradient-to-b from-accent/40 to-transparent relative overflow-hidden">
+          <motion.div 
+            animate={{ y: ["-100%", "100%"] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 bg-accent"
+          />
+        </div>
+      </motion.div>
     </header>
   );
 }
